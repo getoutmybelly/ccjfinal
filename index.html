@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MATH 282 Practice Exam</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#fafaf8;font-family:system-ui,-apple-system,sans-serif;padding:16px}
+  input{font-family:inherit}
+  button{font-family:inherit;transition:opacity .1s}
+  button:hover:not(:disabled){opacity:.8}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const C = {
+  bg:"#fafaf8",card:"#fff",border:"#e4e4e0",muted:"#888",
+  text:"#1a1a18",green:"#0F6E56",greenBg:"#E1F5EE",
+  red:"#993C1D",redBg:"#FAECE7",blue:"#185FA5",blueBg:"#E6F1FB",
+  amber:"#854F0B",amberBg:"#FAEEDA",gray:"#5F5E5A",grayBg:"#F1EFE8",
+};
+
+const MC_QUESTIONS = [
+  {id:"1a",q:"Which of the following indicates the strongest linear relationship?",
+   opts:["r = 0.75","r = −0.95","r = 0.09","r = −0.65"],correct:1,
+   explain:"Strength = |r|. Absolute values: 0.75, 0.95, 0.09, 0.65. Largest = 0.95 → r = −0.95. Sign doesn't matter for 'strongest.'"},
+  {id:"1b",q:"Which statistic is unaffected by outliers?",
+   opts:["Range","Mean","Standard deviation","Median"],correct:3,
+   explain:"Range, Mean, and Std Dev all use extreme values → affected. Median = middle value only → NOT affected by outliers."},
+  {id:"1c",q:"The histogram of exam scores has a large left tail. What is the approximate shape?",
+   opts:["Nearly symmetric","Skewed to the left","Skewed to the right","Bimodal"],correct:1,
+   explain:"Tail points LEFT → left-skewed. Skew direction = where the long tail points."},
+  {id:"1d",q:"P(A)=0.6 and P(B)=0.3. A and B are independent. What is P(A AND B)?",
+   opts:["0.3","0.9","0.18","0.85"],correct:2,
+   explain:"Independent: P(A∩B) = P(A)·P(B) = 0.6 × 0.3 = 0.18."},
+  {id:"1e",q:"A card is drawn from a 52-card deck. What is P(Red or Jack)?",
+   opts:["²³⁄₅₂","²⁄₁₃","⁷⁄₁₃","¹⁵⁄₂₆"],correct:2,
+   explain:"P(R or J) = 26/52 + 4/52 − 2/52 (2 red jacks overlap) = 28/52 = 7/13."},
+  {id:"1f",q:"SRS of n=64 from N(μ=76, σ=16). What is the distribution of X̄?",
+   opts:["N(μ=76, σ=16)","N(μ=76, σ=2)","N(μ=76, σ=0.25)","N(μ=0, σ=1)"],correct:1,
+   explain:"σ_x̄ = σ/√n = 16/√64 = 2. X̄ ~ N(76, 2). Mean unchanged; SE shrinks by √n."},
+  {id:"1g",q:"Repair time is Uniform(1.5, 4.0). What is P(X > 2)?",
+   opts:["0.4","0.8","0.25","0.6"],correct:1,
+   explain:"f(x)=1/(4−1.5)=1/2.5. P(X>2) = (4−2)×(1/2.5) = 2/2.5 = 0.80."},
+  {id:"1h",q:"Telephone survey of 1,502 adults found 69% could identify the vice-president. Is 69% a parameter or statistic?",
+   opts:["Parameter","Statistic"],correct:1,
+   explain:"1,502 is a SAMPLE of US adults. A value from a sample = STATISTIC."},
+  {id:"1i",q:"How large a sample do you need to estimate p within E=0.04 at 95% confidence (p unknown)?",
+   opts:["1068","601","2403","490"],correct:1,
+   explain:"p̂=0.5, z*=1.96. n=0.25×(1.96/0.04)²=0.25×2401=600.25 → round up → 601."},
+  {id:"1j",q:'S={1,2,3,4,5,6,7,8,9,10}. What is P(E) where E = "odd number less than 9"?',
+   opts:["0.4","0.5","0.55","0.6"],correct:0,
+   explain:"Odd AND less than 9: {1,3,5,7} = 4 values. P(E) = 4/10 = 0.4."},
+  {id:"1k",q:"Charlotte divides her day into morning, afternoon, evening and randomly selects 3 per part. Sampling type?",
+   opts:["Simple random","Stratified","Systematic","Cluster"],correct:1,
+   explain:"Day divided into STRATA, then random sample from each → stratified sampling."},
+  {id:"1l",q:'"Medal won in race" — qualitative or quantitative?',
+   opts:["Qualitative","Quantitative"],correct:0,
+   explain:"Bronze/Silver/Gold are categories → qualitative (categorical)."},
+  {id:"1m",q:'"Number of pieces of lumber used to make a deck" — discrete or continuous?',
+   opts:["Discrete","Continuous"],correct:0,
+   explain:"Countable whole numbers = discrete. Continuous = measured with infinite precision."},
+  {id:"1n",q:"H₀: μ=243,775; H₁: μ>243,775. Null is NOT rejected. Correct conclusion?",
+   opts:[
+     "Not sufficient evidence that price has not changed",
+     "Sufficient evidence price has not changed",
+     "Not sufficient evidence that price has increased",
+     "Sufficient evidence that price has increased"
+   ],correct:2,
+   explain:"Fail to reject H₀ → insufficient evidence for H₁. NEVER say H₀ is proven true."},
+  {id:"1o",q:"H₀: μ=2, H₁: μ>2. Left-tailed, right-tailed, or two-tailed?",
+   opts:["Left-tailed","Right-tailed","Two-tailed"],correct:1,
+   explain:'">" in H₁ → right-tailed. Rule: < = left · > = right · ≠ = two-tailed.'},
+];
+
+const FR_QUESTIONS = [
+  {id:"q2a",section:"Q2 (a)",prompt:"Travel times: 8, 12, 15, 10, 5, 7  (n = 6). Find the Mode, Mean, and Median.",
+   fields:[
+     {label:"Mode",answer:"none",alt:["no mode","none (no repeats)","no mode (all unique)"]},
+     {label:"Mean (3 decimal places)",answer:"9.5",alt:["9.500","9.50"]},
+     {label:"Median",answer:"9",alt:["9.0","9.00"]},
+   ]},
+  {id:"q2b",section:"Q2 (b)",prompt:"Same data. Find Q1 and Q3.",
+   fields:[
+     {label:"Q1",answer:"7",alt:["7.0"]},
+     {label:"Q3",answer:"12",alt:["12.0"]},
+   ]},
+  {id:"q2c",section:"Q2 (c)",prompt:"Same data. Find the standard deviation s (3 decimal places).",
+   fields:[
+     {label:"s",answer:"3.619",alt:["3.62","3.618","3.6193","3.6190"]},
+   ]},
+  {id:"q3a",section:"Q3 (a)",prompt:"Data: 17,23,34,15,35,45,36,53,58,88,22,31,55. Find the five-number summary.",
+   fields:[
+     {label:"Min",answer:"15"},
+     {label:"Q1",answer:"22.5"},
+     {label:"Median",answer:"35"},
+     {label:"Q3",answer:"54"},
+     {label:"Max",answer:"88"},
+   ]},
+  {id:"q3b",section:"Q3 (b)",prompt:"Same data. Calculate fences and identify outliers (1.5 IQR rule).",
+   fields:[
+     {label:"IQR",answer:"31.5"},
+     {label:"Lower fence",answer:"-24.75",alt:["−24.75","−24.75"]},
+     {label:"Upper fence",answer:"101.25"},
+     {label:"Any outliers? (yes/no)",answer:"no",alt:["no outliers","none"]},
+   ]},
+  {id:"q5a",section:"Q5 (a)",prompt:"iPhone battery: N(μ=7, σ=0.8). Find P(X ≥ 6).",
+   fields:[
+     {label:"z-score",answer:"-1.25",alt:["−1.25"]},
+     {label:"P(X ≥ 6)",answer:"0.8944",alt:["0.894","0.895"]},
+   ]},
+  {id:"q5b",section:"Q5 (b)",prompt:"Same distribution. Find P(X < 5).",
+   fields:[
+     {label:"z-score",answer:"-2.50",alt:["−2.50","-2.5","−2.5"]},
+     {label:"P(X < 5)",answer:"0.0062",alt:["0.006"]},
+   ]},
+  {id:"q5c",section:"Q5 (c)",prompt:"Same distribution. What talk time is the cutoff for the top 10%?",
+   fields:[
+     {label:"z* (from table)",answer:"1.28"},
+     {label:"x (hours)",answer:"8.024",alt:["8.02"]},
+   ]},
+  {id:"q6",section:"Q6 (setup)",prompt:"Gallup: n=500, p=0.16. Find μ and σ for the binomial normal approximation.",
+   fields:[
+     {label:"μ = np",answer:"80"},
+     {label:"σ = √(np(1−p))",answer:"8.2",alt:["8.198","8.19","8.20"]},
+   ]},
+  {id:"q7a",section:"Q7 (a)",prompt:"Regression: r=0.782, x̄=272.6, ȳ=690.3, sx=23.34, sy=233. Find slope b₁.",
+   fields:[
+     {label:"b₁ (3 decimals)",answer:"7.807",alt:["7.8066","7.806","7.8067"]},
+   ]},
+  {id:"q7b",section:"Q7 (b)",prompt:"Same problem. Find intercept b₀.",
+   fields:[
+     {label:"b₀",answer:"-1437.779",alt:["-1437.78","-1437.7792","−1437.779","−1437.78"]},
+   ]},
+  {id:"q7c",section:"Q7 (c)",prompt:"Using your regression equation, predict ŷ when x = $300.",
+   fields:[
+     {label:"ŷ ($)",answer:"904.20",alt:["904.2","904.201","904.2008"]},
+   ]},
+  {id:"q8a",section:"Q8 (a)",prompt:"College students: Total=16,638; Males=7,317. Find P(Male).",
+   fields:[
+     {label:"P(Male)",answer:"0.4398",alt:["0.440","0.4399"]},
+   ]},
+  {id:"q8b",section:"Q8 (b)",prompt:"Same table: Females total=9,321; Females 18–24=5,668. Find P(18–24 | Female).",
+   fields:[
+     {label:"P(18–24 | Female)",answer:"0.6081",alt:["0.608","0.6080"]},
+   ]},
+  {id:"q9",section:"Q9",prompt:"n=50, x̄=4.58, s=1.10. Compute 95% CI for mean. (t*=2.009, df=49)",
+   fields:[
+     {label:"Lower bound",answer:"4.2675",alt:["4.268","4.267"]},
+     {label:"Upper bound",answer:"4.8925",alt:["4.892","4.893"]},
+   ]},
+  {id:"q10",section:"Q10",prompt:"Teen texting: n=800, x=272. Compute 90% CI for proportion. (z*=1.645)",
+   fields:[
+     {label:"p̂",answer:"0.34",alt:["0.340"]},
+     {label:"Lower bound",answer:"0.3124",alt:["0.312"]},
+     {label:"Upper bound",answer:"0.3676",alt:["0.368","0.3676"]},
+   ]},
+  {id:"q11",section:"Q11",prompt:"Dog Days: n=18, x̄=32.50, σ=8.10, μ₀=35, α=0.05. Left-tailed t-test.",
+   fields:[
+     {label:"t₀ (test statistic)",answer:"-1.31",alt:["−1.31","-1.310","−1.310"]},
+     {label:"df",answer:"17"},
+     {label:"Critical value −t_α",answer:"-1.740",alt:["−1.740","-1.74","−1.74"]},
+     {label:"Reject H₀? (yes/no)",answer:"no",alt:["do not reject","fail to reject"]},
+   ]},
+  {id:"q12",section:"Q12",prompt:"Cavity trees: n=196, x=79, p₀=0.32, α=0.01. Right-tailed z-test.",
+   fields:[
+     {label:"p̂",answer:"0.4036",alt:["0.404","0.40","79/196"]},
+     {label:"z₀ (test statistic)",answer:"2.49",alt:["2.494","2.493"]},
+     {label:"P-value",answer:"0.0064",alt:["0.006","0.0063"]},
+     {label:"Reject H₀? (yes/no)",answer:"yes",alt:["reject"]},
+   ]},
+];
+
+const STORAGE_KEY = "math282_v3";
+function loadState(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{};}catch{return {};}}
+function saveState(s){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(s));}catch{}}
+
+function norm(str){return String(str).toLowerCase().replace(/[$,\s]/g,"").replace(/−/g,"-");}
+function check(input,correct,alts=[]){
+  const n=norm(input),c=norm(correct);
+  return n===c||(alts||[]).some(a=>norm(a)===n);
+}
+
+function Tag({color,bg,children}){
+  return <span style={{fontSize:11,fontWeight:500,padding:"2px 7px",borderRadius:20,background:bg,color,marginLeft:6}}>{children}</span>;
+}
+
+function MCCard({q,onScore,saved}){
+  const [sel,setSel]=useState(saved?.sel??null);
+  const [done,setDone]=useState(saved?.done??false);
+  const correct=done?sel===q.correct:null;
+
+  function submit(){
+    if(sel===null)return;
+    setDone(true);
+    onScore(q.id,sel===q.correct,{sel,done:true});
+  }
+  function reset(){setSel(null);setDone(false);onScore(q.id,null,null);}
+
+  return (
+    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,marginBottom:8,overflow:"hidden"}}>
+      <div style={{padding:"10px 14px"}}>
+        <div style={{fontSize:13,fontWeight:500,color:C.text,marginBottom:10}}><b>{q.id}.</b> {q.q}</div>
+        {q.opts.map((opt,i)=>{
+          let bg="#f5f5f2",border=`1px solid ${C.border}`,col=C.text;
+          if(done){
+            if(i===q.correct){bg=C.greenBg;border=`1px solid ${C.green}`;col=C.green;}
+            else if(i===sel&&i!==q.correct){bg=C.redBg;border=`1px solid ${C.red}`;col=C.red;}
+          } else if(sel===i){bg=C.blueBg;border=`1px solid ${C.blue}`;col=C.blue;}
+          return (
+            <div key={i} onClick={()=>!done&&setSel(i)}
+              style={{display:"flex",alignItems:"center",gap:8,padding:"7px 10px",borderRadius:7,marginBottom:4,
+                      background:bg,border,cursor:done?"default":"pointer",color:col,fontSize:13}}>
+              <span style={{fontWeight:500,minWidth:16}}>{i+1}.</span>{opt}
+              {done&&i===q.correct&&<span style={{marginLeft:"auto"}}>✓</span>}
+              {done&&i===sel&&i!==q.correct&&<span style={{marginLeft:"auto"}}>✗</span>}
+            </div>
+          );
+        })}
+        {done&&<div style={{marginTop:8,fontSize:12,color:C.gray,background:C.grayBg,borderRadius:6,padding:"6px 10px"}}>
+          💡 {q.explain}
+        </div>}
+      </div>
+      <div style={{borderTop:`1px solid ${C.border}`,padding:"8px 14px",display:"flex",gap:8,alignItems:"center"}}>
+        {!done
+          ?<button onClick={submit} disabled={sel===null}
+             style={{fontSize:12,padding:"5px 14px",borderRadius:6,border:`1px solid ${C.border}`,
+                     background:sel===null?"#f0f0ee":C.text,color:sel===null?C.muted:"#fff",cursor:sel===null?"default":"pointer"}}>
+             Check
+           </button>
+          :<>
+            <Tag color={correct?C.green:C.red} bg={correct?C.greenBg:C.redBg}>{correct?"✓ Correct":"✗ Incorrect"}</Tag>
+            <button onClick={reset} style={{fontSize:11,padding:"3px 9px",borderRadius:6,border:`1px solid ${C.border}`,background:"transparent",color:C.muted,cursor:"pointer",marginLeft:4}}>Retry</button>
+          </>
+        }
+      </div>
+    </div>
+  );
+}
+
+function FRCard({q,onScore,saved}){
+  const [vals,setVals]=useState(saved?.vals||q.fields.map(()=>""));
+  const [results,setResults]=useState(saved?.results||null);
+
+  function doCheck(){
+    const res=q.fields.map((f,i)=>check(vals[i],f.answer,f.alt));
+    setResults(res);
+    const score=res.filter(Boolean).length;
+    onScore(q.id,score,q.fields.length,{vals,results:res});
+  }
+  function reset(){setVals(q.fields.map(()=>""));setResults(null);onScore(q.id,null,q.fields.length,null);}
+
+  const allOk=results&&results.every(Boolean);
+  const score=results?results.filter(Boolean).length:null;
+
+  return (
+    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,marginBottom:8,overflow:"hidden"}}>
+      <div style={{padding:"10px 14px"}}>
+        <div style={{fontSize:11,fontWeight:600,color:C.muted,textTransform:"uppercase",letterSpacing:".05em",marginBottom:4}}>{q.section}</div>
+        <div style={{fontSize:13,color:C.text,marginBottom:10}}>{q.prompt}</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:8}}>
+          {q.fields.map((f,i)=>{
+            let bc=C.border,bg="#f9f9f7";
+            if(results){bc=results[i]?C.green:C.red;bg=results[i]?C.greenBg:C.redBg;}
+            return (
+              <div key={i}>
+                <label style={{fontSize:11,color:C.muted,fontWeight:500,display:"block",marginBottom:3}}>{f.label}</label>
+                <input value={vals[i]} onChange={e=>{const v=[...vals];v[i]=e.target.value;setVals(v);}}
+                  disabled={!!results} placeholder="your answer"
+                  style={{width:"100%",padding:"6px 9px",borderRadius:6,border:`1px solid ${bc}`,background:bg,fontSize:13,color:C.text,outline:"none"}}/>
+                {results&&!results[i]&&<div style={{fontSize:11,color:C.red,marginTop:2}}>✓ {f.answer}</div>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div style={{borderTop:`1px solid ${C.border}`,padding:"8px 14px",display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+        {!results
+          ?<button onClick={doCheck}
+             style={{fontSize:12,padding:"5px 14px",borderRadius:6,border:`1px solid ${C.border}`,background:C.text,color:"#fff",cursor:"pointer"}}>
+             Check
+           </button>
+          :<>
+            <Tag color={allOk?C.green:C.amber} bg={allOk?C.greenBg:C.amberBg}>{score}/{q.fields.length} correct</Tag>
+            <button onClick={reset} style={{fontSize:11,padding:"3px 9px",borderRadius:6,border:`1px solid ${C.border}`,background:"transparent",color:C.muted,cursor:"pointer",marginLeft:4}}>Retry</button>
+          </>
+        }
+      </div>
+    </div>
+  );
+}
+
+function Progress({mcs,frs}){
+  const mcRight=Object.values(mcs).filter(v=>v===true).length;
+  const mcDone=Object.values(mcs).filter(v=>v!==null).length;
+  const frTotal=FR_QUESTIONS.reduce((a,q)=>a+q.fields.length,0);
+  const frRight=Object.values(frs).reduce((a,v)=>a+(v||0),0);
+  const frDone=Object.values(frs).filter(v=>v!==null).length;
+  const cells=[
+    ["MC correct",`${mcRight} / ${MC_QUESTIONS.length}`],
+    ["MC attempted",`${mcDone} / ${MC_QUESTIONS.length}`],
+    ["FR fields",`${frRight} / ${frTotal}`],
+    ["FR attempted",`${frDone} / ${FR_QUESTIONS.length}`],
+  ];
+  return (
+    <div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:12}}>
+        {cells.map(([l,v])=>(
+          <div key={l} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 12px"}}>
+            <div style={{fontSize:11,color:C.muted,marginBottom:3}}>{l}</div>
+            <div style={{fontSize:22,fontWeight:500,color:C.text}}>{v}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{fontSize:12,color:C.muted}}>Scores save automatically. Use "Reset all" on the header for a clean timed run.</div>
+    </div>
+  );
+}
+
+function App(){
+  const [tab,setTab]=useState("mc");
+  const [mcs,setMcs]=useState({});
+  const [mcSaved,setMcSaved]=useState({});
+  const [frs,setFrs]=useState({});
+  const [frSaved,setFrSaved]=useState({});
+
+  useEffect(()=>{
+    const s=loadState();
+    if(s.mcs)setMcs(s.mcs);
+    if(s.mcSaved)setMcSaved(s.mcSaved);
+    if(s.frs)setFrs(s.frs);
+    if(s.frSaved)setFrSaved(s.frSaved);
+  },[]);
+
+  function hmc(id,correct,data){
+    const nm={...mcs,[id]:correct},nd={...mcSaved,[id]:data};
+    setMcs(nm);setMcSaved(nd);
+    saveState({mcs:nm,mcSaved:nd,frs,frSaved});
+  }
+  function hfr(id,score,total,data){
+    const nm={...frs,[id]:score},nd={...frSaved,[id]:data};
+    setFrs(nm);setFrSaved(nd);
+    saveState({mcs,mcSaved,frs:nm,frSaved:nd});
+  }
+  function resetAll(){setMcs({});setMcSaved({});setFrs({});setFrSaved({});saveState({});}
+
+  const tabs=[["mc","Multiple Choice"],["fr","Free Response"],["prog","Progress"]];
+
+  return (
+    <div style={{maxWidth:720,margin:"0 auto",fontFamily:"system-ui,sans-serif"}}>
+      {/* Header */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:8}}>
+        <div>
+          <div style={{fontSize:17,fontWeight:600,color:C.text}}>MATH 282 — Practice Exam</div>
+          <div style={{fontSize:12,color:C.muted}}>Spring 2025 · Final exam Monday May 5, 12:30–2:30 PM · Row D</div>
+        </div>
+        <button onClick={resetAll} style={{fontSize:11,padding:"4px 10px",borderRadius:6,border:`1px solid ${C.border}`,background:"transparent",color:C.muted,cursor:"pointer"}}>Reset all</button>
+      </div>
+
+      {/* Tabs */}
+      <div style={{display:"flex",gap:0,marginBottom:16,borderBottom:`1px solid ${C.border}`}}>
+        {tabs.map(([id,label])=>(
+          <button key={id} onClick={()=>setTab(id)}
+            style={{fontSize:13,padding:"8px 16px",border:"none",borderBottom:tab===id?`2px solid ${C.text}`:"2px solid transparent",
+                    background:"transparent",color:tab===id?C.text:C.muted,cursor:"pointer",fontWeight:tab===id?500:400,marginBottom:-1}}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab==="mc"&&(
+        <div>
+          <div style={{fontSize:12,color:C.muted,marginBottom:12}}>15 questions · Select an answer then tap Check · Explanation reveals after each attempt.</div>
+          {MC_QUESTIONS.map(q=><MCCard key={q.id} q={q} onScore={hmc} saved={mcSaved[q.id]}/>)}
+        </div>
+      )}
+
+      {tab==="fr"&&(
+        <div>
+          <div style={{fontSize:12,color:C.muted,marginBottom:12}}>Type your answer and tap Check · Keep 3 decimal places · Correct answer shown on miss.</div>
+          {FR_QUESTIONS.map(q=><FRCard key={q.id} q={q} onScore={hfr} saved={frSaved[q.id]}/>)}
+        </div>
+      )}
+
+      {tab==="prog"&&<Progress mcs={mcs} frs={frs}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
