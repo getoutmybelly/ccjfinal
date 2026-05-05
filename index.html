@@ -1,402 +1,1495 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>MATH 282 Practice Exam</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCJ 462 — Victims of Crime | Final Exam Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#fafaf8;font-family:system-ui,-apple-system,sans-serif;padding:16px}
-  input{font-family:inherit}
-  button{font-family:inherit;transition:opacity .1s}
-  button:hover:not(:disabled){opacity:.8}
-  ::-webkit-scrollbar{width:6px}
-  ::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --card: #161a22;
+    --border: #1e2530;
+    --accent: #e8c547;
+    --accent2: #4ecdc4;
+    --red: #e05252;
+    --green: #52c97a;
+    --text: #d4d8e0;
+    --muted: #5a6070;
+    --heading: #f0f2f5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 18px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  .site-header {
+    text-align: center;
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+
+  .site-header .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .site-header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    color: var(--heading);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  .site-header h1 span {
+    color: var(--accent);
+  }
+
+  .site-header .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .stat-cell {
+    background: var(--surface);
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .stat-cell .val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-cell .lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-top: 0.25rem;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    margin-bottom: 2rem;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 8px rgba(232,197,71,0.5);
+  }
+
+  /* CATEGORY TAG */
+  .category-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    border: 1px solid rgba(78,205,196,0.3);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    margin-bottom: 1.25rem;
+  }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2rem 2rem 1.75rem;
+    margin-bottom: 1.5rem;
+    animation: slideIn 0.35s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+
+  .question-text {
+    font-size: 1.25rem;
+    line-height: 1.55;
+    color: var(--heading);
+    font-weight: 600;
+    margin-bottom: 1.75rem;
+  }
+
+  /* OPTIONS */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .option-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.9rem 1.1rem;
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 1.05rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--heading);
+    background: rgba(232,197,71,0.05);
+    transform: translateX(3px);
+  }
+
+  .option-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--border);
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+  }
+
+  .option-btn.correct {
+    border-color: var(--green);
+    background: rgba(82,201,122,0.08);
+    color: var(--green);
+  }
+
+  .option-btn.correct .option-letter {
+    background: var(--green);
+    color: #000;
+    border-color: var(--green);
+  }
+
+  .option-btn.wrong {
+    border-color: var(--red);
+    background: rgba(224,82,82,0.08);
+    color: var(--red);
+    text-decoration: line-through;
+    opacity: 0.75;
+  }
+
+  .option-btn.wrong .option-letter {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .option-btn:disabled { cursor: default; }
+
+  /* EXPLANATION BOX */
+  .explanation {
+    margin-top: 1.25rem;
+    padding: 1rem 1.25rem;
+    background: rgba(78,205,196,0.06);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 4px 4px 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text);
+    animation: fadeIn 0.3s ease;
+    display: none;
+  }
+
+  .explanation.show { display: block; }
+  .explanation strong { color: var(--accent2); }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* FEEDBACK FLASH */
+  .feedback-flash {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.05em;
+    text-align: center;
+    padding: 0.5rem;
+    animation: flashIn 0.3s ease;
+    display: none;
+    margin-top: 1rem;
+  }
+
+  .feedback-flash.show { display: block; }
+  .feedback-flash.correct-flash { color: var(--green); }
+  .feedback-flash.wrong-flash { color: var(--red); }
+
+  @keyframes flashIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    60% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* NEXT BUTTON */
+  .next-btn {
+    display: none;
+    margin-top: 1.25rem;
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    padding: 0.9rem 1.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .next-btn:hover {
+    background: #f0cf5a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(232,197,71,0.3);
+  }
+
+  .next-btn.show { display: block; }
+
+  /* MISSED TOPICS TRACKER */
+  .weak-spots {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .weak-spots h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    color: var(--heading);
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .weak-spots h3::before {
+    content: '⚠';
+    color: var(--accent);
+  }
+
+  .weak-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 2px;
+    margin: 0.2rem;
+    background: rgba(224,82,82,0.1);
+    border: 1px solid rgba(224,82,82,0.3);
+    color: var(--red);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .no-weak {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--green);
+  }
+
+  /* RESULTS SCREEN */
+  #results-screen {
+    display: none;
+    text-align: center;
+    animation: slideIn 0.4s ease;
+  }
+
+  .results-grade {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 20vw, 10rem);
+    line-height: 1;
+    margin: 1.5rem 0;
+  }
+
+  .results-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .results-msg {
+    font-size: 1.2rem;
+    color: var(--text);
+    margin: 1.5rem 0 2rem;
+    line-height: 1.6;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .missed-list {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    text-align: left;
+    margin-bottom: 2rem;
+  }
+
+  .missed-list h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    color: var(--red);
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+
+  .missed-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .missed-item:last-child { border-bottom: none; }
+
+  .missed-item .mi-q {
+    color: var(--heading);
+    margin-bottom: 0.4rem;
+  }
+
+  .missed-item .mi-your {
+    color: var(--red);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  .missed-item .mi-correct {
+    color: var(--green);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    padding: 0.85rem 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .btn-primary:hover {
+    background: #f0cf5a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(232,197,71,0.3);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.85rem 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  /* MODE SELECT */
+  #mode-screen {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  #mode-screen h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--heading);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+  }
+
+  #mode-screen p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .mode-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+  }
+
+  .mode-card:hover {
+    border-color: var(--accent);
+    background: rgba(232,197,71,0.04);
+    transform: translateY(-2px);
+  }
+
+  .mode-icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .mode-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.15rem;
+    color: var(--heading);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.35rem;
+  }
+
+  .mode-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    line-height: 1.6;
+    letter-spacing: 0.05em;
+  }
+
+  /* FLASHCARD */
+  .flashcard {
+    perspective: 1000px;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+  }
+
+  .flashcard-inner {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+  }
+
+  .flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flashcard-front, .flashcard-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .flashcard-back {
+    transform: rotateY(180deg);
+    border-color: var(--accent2);
+    background: rgba(78,205,196,0.04);
+  }
+
+  .flashcard-front .fc-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .flashcard-front .fc-term {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--heading);
+    line-height: 1.4;
+  }
+
+  .flashcard-back .fc-def {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  .flashcard-hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* CATEGORY FILTER */
+  .filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .filter-btn.active, .filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* FOOTER */
+  .site-footer {
+    text-align: center;
+    padding: 2rem 0;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* SCREEN MANAGEMENT */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  @media (max-width: 600px) {
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .question-text { font-size: 1.1rem; }
+    .option-btn { font-size: 0.95rem; }
+  }
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect } = React;
+<div class="container">
 
-const C = {
-  bg:"#fafaf8",card:"#fff",border:"#e4e4e0",muted:"#888",
-  text:"#1a1a18",green:"#0F6E56",greenBg:"#E1F5EE",
-  red:"#993C1D",redBg:"#FAECE7",blue:"#185FA5",blueBg:"#E6F1FB",
-  amber:"#854F0B",amberBg:"#FAEEDA",gray:"#5F5E5A",grayBg:"#F1EFE8",
-};
+  <header class="site-header">
+    <div class="label">CCJ 462 / 563-001 · Spring 2026</div>
+    <h1>VICTIMS<br>OF <span>CRIME</span></h1>
+    <div class="subtitle">FINAL EXAM PRACTICE TOOL · DR. CHO</div>
+  </header>
 
-const MC_QUESTIONS = [
-  {id:"1a",q:"Which of the following indicates the strongest linear relationship?",
-   opts:["r = 0.75","r = −0.95","r = 0.09","r = −0.65"],correct:1,
-   explain:"Strength = |r|. Absolute values: 0.75, 0.95, 0.09, 0.65. Largest = 0.95 → r = −0.95. Sign doesn't matter for 'strongest.'"},
-  {id:"1b",q:"Which statistic is unaffected by outliers?",
-   opts:["Range","Mean","Standard deviation","Median"],correct:3,
-   explain:"Range, Mean, and Std Dev all use extreme values → affected. Median = middle value only → NOT affected by outliers."},
-  {id:"1c",q:"The histogram of exam scores has a large left tail. What is the approximate shape?",
-   opts:["Nearly symmetric","Skewed to the left","Skewed to the right","Bimodal"],correct:1,
-   explain:"Tail points LEFT → left-skewed. Skew direction = where the long tail points."},
-  {id:"1d",q:"P(A)=0.6 and P(B)=0.3. A and B are independent. What is P(A AND B)?",
-   opts:["0.3","0.9","0.18","0.85"],correct:2,
-   explain:"Independent: P(A∩B) = P(A)·P(B) = 0.6 × 0.3 = 0.18."},
-  {id:"1e",q:"A card is drawn from a 52-card deck. What is P(Red or Jack)?",
-   opts:["²³⁄₅₂","²⁄₁₃","⁷⁄₁₃","¹⁵⁄₂₆"],correct:2,
-   explain:"P(R or J) = 26/52 + 4/52 − 2/52 (2 red jacks overlap) = 28/52 = 7/13."},
-  {id:"1f",q:"SRS of n=64 from N(μ=76, σ=16). What is the distribution of X̄?",
-   opts:["N(μ=76, σ=16)","N(μ=76, σ=2)","N(μ=76, σ=0.25)","N(μ=0, σ=1)"],correct:1,
-   explain:"σ_x̄ = σ/√n = 16/√64 = 2. X̄ ~ N(76, 2). Mean unchanged; SE shrinks by √n."},
-  {id:"1g",q:"Repair time is Uniform(1.5, 4.0). What is P(X > 2)?",
-   opts:["0.4","0.8","0.25","0.6"],correct:1,
-   explain:"f(x)=1/(4−1.5)=1/2.5. P(X>2) = (4−2)×(1/2.5) = 2/2.5 = 0.80."},
-  {id:"1h",q:"Telephone survey of 1,502 adults found 69% could identify the vice-president. Is 69% a parameter or statistic?",
-   opts:["Parameter","Statistic"],correct:1,
-   explain:"1,502 is a SAMPLE of US adults. A value from a sample = STATISTIC."},
-  {id:"1i",q:"How large a sample do you need to estimate p within E=0.04 at 95% confidence (p unknown)?",
-   opts:["1068","601","2403","490"],correct:1,
-   explain:"p̂=0.5, z*=1.96. n=0.25×(1.96/0.04)²=0.25×2401=600.25 → round up → 601."},
-  {id:"1j",q:'S={1,2,3,4,5,6,7,8,9,10}. What is P(E) where E = "odd number less than 9"?',
-   opts:["0.4","0.5","0.55","0.6"],correct:0,
-   explain:"Odd AND less than 9: {1,3,5,7} = 4 values. P(E) = 4/10 = 0.4."},
-  {id:"1k",q:"Charlotte divides her day into morning, afternoon, evening and randomly selects 3 per part. Sampling type?",
-   opts:["Simple random","Stratified","Systematic","Cluster"],correct:1,
-   explain:"Day divided into STRATA, then random sample from each → stratified sampling."},
-  {id:"1l",q:'"Medal won in race" — qualitative or quantitative?',
-   opts:["Qualitative","Quantitative"],correct:0,
-   explain:"Bronze/Silver/Gold are categories → qualitative (categorical)."},
-  {id:"1m",q:'"Number of pieces of lumber used to make a deck" — discrete or continuous?',
-   opts:["Discrete","Continuous"],correct:0,
-   explain:"Countable whole numbers = discrete. Continuous = measured with infinite precision."},
-  {id:"1n",q:"H₀: μ=243,775; H₁: μ>243,775. Null is NOT rejected. Correct conclusion?",
-   opts:[
-     "Not sufficient evidence that price has not changed",
-     "Sufficient evidence price has not changed",
-     "Not sufficient evidence that price has increased",
-     "Sufficient evidence that price has increased"
-   ],correct:2,
-   explain:"Fail to reject H₀ → insufficient evidence for H₁. NEVER say H₀ is proven true."},
-  {id:"1o",q:"H₀: μ=2, H₁: μ>2. Left-tailed, right-tailed, or two-tailed?",
-   opts:["Left-tailed","Right-tailed","Two-tailed"],correct:1,
-   explain:'">" in H₁ → right-tailed. Rule: < = left · > = right · ≠ = two-tailed.'},
-];
+  <!-- MODE SELECT -->
+  <div id="mode-screen" class="screen active">
+    <h2>Choose Your Mode</h2>
+    <p>How do you want to study tonight?</p>
 
-const FR_QUESTIONS = [
-  {id:"q2a",section:"Q2 (a)",prompt:"Travel times: 8, 12, 15, 10, 5, 7  (n = 6). Find the Mode, Mean, and Median.",
-   fields:[
-     {label:"Mode",answer:"none",alt:["no mode","none (no repeats)","no mode (all unique)"]},
-     {label:"Mean (3 decimal places)",answer:"9.5",alt:["9.500","9.50"]},
-     {label:"Median",answer:"9",alt:["9.0","9.00"]},
-   ]},
-  {id:"q2b",section:"Q2 (b)",prompt:"Same data. Find Q1 and Q3.",
-   fields:[
-     {label:"Q1",answer:"7",alt:["7.0"]},
-     {label:"Q3",answer:"12",alt:["12.0"]},
-   ]},
-  {id:"q2c",section:"Q2 (c)",prompt:"Same data. Find the standard deviation s (3 decimal places).",
-   fields:[
-     {label:"s",answer:"3.619",alt:["3.62","3.618","3.6193","3.6190"]},
-   ]},
-  {id:"q3a",section:"Q3 (a)",prompt:"Data: 17,23,34,15,35,45,36,53,58,88,22,31,55. Find the five-number summary.",
-   fields:[
-     {label:"Min",answer:"15"},
-     {label:"Q1",answer:"22.5"},
-     {label:"Median",answer:"35"},
-     {label:"Q3",answer:"54"},
-     {label:"Max",answer:"88"},
-   ]},
-  {id:"q3b",section:"Q3 (b)",prompt:"Same data. Calculate fences and identify outliers (1.5 IQR rule).",
-   fields:[
-     {label:"IQR",answer:"31.5"},
-     {label:"Lower fence",answer:"-24.75",alt:["−24.75","−24.75"]},
-     {label:"Upper fence",answer:"101.25"},
-     {label:"Any outliers? (yes/no)",answer:"no",alt:["no outliers","none"]},
-   ]},
-  {id:"q5a",section:"Q5 (a)",prompt:"iPhone battery: N(μ=7, σ=0.8). Find P(X ≥ 6).",
-   fields:[
-     {label:"z-score",answer:"-1.25",alt:["−1.25"]},
-     {label:"P(X ≥ 6)",answer:"0.8944",alt:["0.894","0.895"]},
-   ]},
-  {id:"q5b",section:"Q5 (b)",prompt:"Same distribution. Find P(X < 5).",
-   fields:[
-     {label:"z-score",answer:"-2.50",alt:["−2.50","-2.5","−2.5"]},
-     {label:"P(X < 5)",answer:"0.0062",alt:["0.006"]},
-   ]},
-  {id:"q5c",section:"Q5 (c)",prompt:"Same distribution. What talk time is the cutoff for the top 10%?",
-   fields:[
-     {label:"z* (from table)",answer:"1.28"},
-     {label:"x (hours)",answer:"8.024",alt:["8.02"]},
-   ]},
-  {id:"q6",section:"Q6 (setup)",prompt:"Gallup: n=500, p=0.16. Find μ and σ for the binomial normal approximation.",
-   fields:[
-     {label:"μ = np",answer:"80"},
-     {label:"σ = √(np(1−p))",answer:"8.2",alt:["8.198","8.19","8.20"]},
-   ]},
-  {id:"q7a",section:"Q7 (a)",prompt:"Regression: r=0.782, x̄=272.6, ȳ=690.3, sx=23.34, sy=233. Find slope b₁.",
-   fields:[
-     {label:"b₁ (3 decimals)",answer:"7.807",alt:["7.8066","7.806","7.8067"]},
-   ]},
-  {id:"q7b",section:"Q7 (b)",prompt:"Same problem. Find intercept b₀.",
-   fields:[
-     {label:"b₀",answer:"-1437.779",alt:["-1437.78","-1437.7792","−1437.779","−1437.78"]},
-   ]},
-  {id:"q7c",section:"Q7 (c)",prompt:"Using your regression equation, predict ŷ when x = $300.",
-   fields:[
-     {label:"ŷ ($)",answer:"904.20",alt:["904.2","904.201","904.2008"]},
-   ]},
-  {id:"q8a",section:"Q8 (a)",prompt:"College students: Total=16,638; Males=7,317. Find P(Male).",
-   fields:[
-     {label:"P(Male)",answer:"0.4398",alt:["0.440","0.4399"]},
-   ]},
-  {id:"q8b",section:"Q8 (b)",prompt:"Same table: Females total=9,321; Females 18–24=5,668. Find P(18–24 | Female).",
-   fields:[
-     {label:"P(18–24 | Female)",answer:"0.6081",alt:["0.608","0.6080"]},
-   ]},
-  {id:"q9",section:"Q9",prompt:"n=50, x̄=4.58, s=1.10. Compute 95% CI for mean. (t*=2.009, df=49)",
-   fields:[
-     {label:"Lower bound",answer:"4.2675",alt:["4.268","4.267"]},
-     {label:"Upper bound",answer:"4.8925",alt:["4.892","4.893"]},
-   ]},
-  {id:"q10",section:"Q10",prompt:"Teen texting: n=800, x=272. Compute 90% CI for proportion. (z*=1.645)",
-   fields:[
-     {label:"p̂",answer:"0.34",alt:["0.340"]},
-     {label:"Lower bound",answer:"0.3124",alt:["0.312"]},
-     {label:"Upper bound",answer:"0.3676",alt:["0.368","0.3676"]},
-   ]},
-  {id:"q11",section:"Q11",prompt:"Dog Days: n=18, x̄=32.50, σ=8.10, μ₀=35, α=0.05. Left-tailed t-test.",
-   fields:[
-     {label:"t₀ (test statistic)",answer:"-1.31",alt:["−1.31","-1.310","−1.310"]},
-     {label:"df",answer:"17"},
-     {label:"Critical value −t_α",answer:"-1.740",alt:["−1.740","-1.74","−1.74"]},
-     {label:"Reject H₀? (yes/no)",answer:"no",alt:["do not reject","fail to reject"]},
-   ]},
-  {id:"q12",section:"Q12",prompt:"Cavity trees: n=196, x=79, p₀=0.32, α=0.01. Right-tailed z-test.",
-   fields:[
-     {label:"p̂",answer:"0.4036",alt:["0.404","0.40","79/196"]},
-     {label:"z₀ (test statistic)",answer:"2.49",alt:["2.494","2.493"]},
-     {label:"P-value",answer:"0.0064",alt:["0.006","0.0063"]},
-     {label:"Reject H₀? (yes/no)",answer:"yes",alt:["reject"]},
-   ]},
-];
-
-const STORAGE_KEY = "math282_v3";
-function loadState(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{};}catch{return {};}}
-function saveState(s){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(s));}catch{}}
-
-function norm(str){return String(str).toLowerCase().replace(/[$,\s]/g,"").replace(/−/g,"-");}
-function check(input,correct,alts=[]){
-  const n=norm(input),c=norm(correct);
-  return n===c||(alts||[]).some(a=>norm(a)===n);
-}
-
-function Tag({color,bg,children}){
-  return <span style={{fontSize:11,fontWeight:500,padding:"2px 7px",borderRadius:20,background:bg,color,marginLeft:6}}>{children}</span>;
-}
-
-function MCCard({q,onScore,saved}){
-  const [sel,setSel]=useState(saved?.sel??null);
-  const [done,setDone]=useState(saved?.done??false);
-  const correct=done?sel===q.correct:null;
-
-  function submit(){
-    if(sel===null)return;
-    setDone(true);
-    onScore(q.id,sel===q.correct,{sel,done:true});
-  }
-  function reset(){setSel(null);setDone(false);onScore(q.id,null,null);}
-
-  return (
-    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,marginBottom:8,overflow:"hidden"}}>
-      <div style={{padding:"10px 14px"}}>
-        <div style={{fontSize:13,fontWeight:500,color:C.text,marginBottom:10}}><b>{q.id}.</b> {q.q}</div>
-        {q.opts.map((opt,i)=>{
-          let bg="#f5f5f2",border=`1px solid ${C.border}`,col=C.text;
-          if(done){
-            if(i===q.correct){bg=C.greenBg;border=`1px solid ${C.green}`;col=C.green;}
-            else if(i===sel&&i!==q.correct){bg=C.redBg;border=`1px solid ${C.red}`;col=C.red;}
-          } else if(sel===i){bg=C.blueBg;border=`1px solid ${C.blue}`;col=C.blue;}
-          return (
-            <div key={i} onClick={()=>!done&&setSel(i)}
-              style={{display:"flex",alignItems:"center",gap:8,padding:"7px 10px",borderRadius:7,marginBottom:4,
-                      background:bg,border,cursor:done?"default":"pointer",color:col,fontSize:13}}>
-              <span style={{fontWeight:500,minWidth:16}}>{i+1}.</span>{opt}
-              {done&&i===q.correct&&<span style={{marginLeft:"auto"}}>✓</span>}
-              {done&&i===sel&&i!==q.correct&&<span style={{marginLeft:"auto"}}>✗</span>}
-            </div>
-          );
-        })}
-        {done&&<div style={{marginTop:8,fontSize:12,color:C.gray,background:C.grayBg,borderRadius:6,padding:"6px 10px"}}>
-          💡 {q.explain}
-        </div>}
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startQuiz('all')">
+        <div class="mode-icon">🎯</div>
+        <div class="mode-title">Full Practice Exam</div>
+        <div class="mode-desc">All questions, randomized order. Simulates real exam conditions.</div>
       </div>
-      <div style={{borderTop:`1px solid ${C.border}`,padding:"8px 14px",display:"flex",gap:8,alignItems:"center"}}>
-        {!done
-          ?<button onClick={submit} disabled={sel===null}
-             style={{fontSize:12,padding:"5px 14px",borderRadius:6,border:`1px solid ${C.border}`,
-                     background:sel===null?"#f0f0ee":C.text,color:sel===null?C.muted:"#fff",cursor:sel===null?"default":"pointer"}}>
-             Check
-           </button>
-          :<>
-            <Tag color={correct?C.green:C.red} bg={correct?C.greenBg:C.redBg}>{correct?"✓ Correct":"✗ Incorrect"}</Tag>
-            <button onClick={reset} style={{fontSize:11,padding:"3px 9px",borderRadius:6,border:`1px solid ${C.border}`,background:"transparent",color:C.muted,cursor:"pointer",marginLeft:4}}>Retry</button>
-          </>
-        }
+      <div class="mode-card" onclick="startQuiz('missed')">
+        <div class="mode-icon">🔥</div>
+        <div class="mode-title">Weak Spots Only</div>
+        <div class="mode-desc">Drills only the categories you've been missing. Builds on gaps.</div>
+      </div>
+      <div class="mode-card" onclick="showScreen('flashcard-screen'); initFlashcards()">
+        <div class="mode-icon">⚡</div>
+        <div class="mode-title">Flashcard Mode</div>
+        <div class="mode-desc">Key terms and definitions. Click to flip. Fast-twitch memory building.</div>
+      </div>
+      <div class="mode-card" onclick="startQuiz('category')">
+        <div class="mode-icon">📂</div>
+        <div class="mode-title">By Category</div>
+        <div class="mode-desc">Pick a specific topic to drill. Focused repetition per module.</div>
       </div>
     </div>
-  );
-}
 
-function FRCard({q,onScore,saved}){
-  const [vals,setVals]=useState(saved?.vals||q.fields.map(()=>""));
-  const [results,setResults]=useState(saved?.results||null);
+    <div id="weak-spots-home" class="weak-spots" style="display:none">
+      <h3>Your Weak Spots</h3>
+      <div id="weak-tags-home"></div>
+    </div>
+  </div>
 
-  function doCheck(){
-    const res=q.fields.map((f,i)=>check(vals[i],f.answer,f.alt));
-    setResults(res);
-    const score=res.filter(Boolean).length;
-    onScore(q.id,score,q.fields.length,{vals,results:res});
-  }
-  function reset(){setVals(q.fields.map(()=>""));setResults(null);onScore(q.id,null,q.fields.length,null);}
+  <!-- CATEGORY SELECT -->
+  <div id="category-screen" class="screen">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--heading);margin-bottom:1rem;letter-spacing:.06em">Select a Category</h2>
+    <div id="cat-grid" class="mode-grid"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="showScreen('mode-screen')">← Back</button>
+    </div>
+  </div>
 
-  const allOk=results&&results.every(Boolean);
-  const score=results?results.filter(Boolean).length:null;
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen" class="screen">
+    <div class="stats-bar">
+      <div class="stat-cell">
+        <div class="val" id="stat-q">0</div>
+        <div class="lbl">Question</div>
+      </div>
+      <div class="stat-cell">
+        <div class="val" id="stat-correct">0</div>
+        <div class="lbl">Correct</div>
+      </div>
+      <div class="stat-cell">
+        <div class="val" id="stat-wrong">0</div>
+        <div class="lbl">Wrong</div>
+      </div>
+      <div class="stat-cell">
+        <div class="val" id="stat-pct">—</div>
+        <div class="lbl">Score %</div>
+      </div>
+    </div>
 
-  return (
-    <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,marginBottom:8,overflow:"hidden"}}>
-      <div style={{padding:"10px 14px"}}>
-        <div style={{fontSize:11,fontWeight:600,color:C.muted,textTransform:"uppercase",letterSpacing:".05em",marginBottom:4}}>{q.section}</div>
-        <div style={{fontSize:13,color:C.text,marginBottom:10}}>{q.prompt}</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:8}}>
-          {q.fields.map((f,i)=>{
-            let bc=C.border,bg="#f9f9f7";
-            if(results){bc=results[i]?C.green:C.red;bg=results[i]?C.greenBg:C.redBg;}
-            return (
-              <div key={i}>
-                <label style={{fontSize:11,color:C.muted,fontWeight:500,display:"block",marginBottom:3}}>{f.label}</label>
-                <input value={vals[i]} onChange={e=>{const v=[...vals];v[i]=e.target.value;setVals(v);}}
-                  disabled={!!results} placeholder="your answer"
-                  style={{width:"100%",padding:"6px 9px",borderRadius:6,border:`1px solid ${bc}`,background:bg,fontSize:13,color:C.text,outline:"none"}}/>
-                {results&&!results[i]&&<div style={{fontSize:11,color:C.red,marginTop:2}}>✓ {f.answer}</div>}
-              </div>
-            );
-          })}
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="prog-label">Question 1 of 0</span>
+        <span id="prog-pct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="question-area"></div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="showScreen('mode-screen')">← Menu</button>
+    </div>
+  </div>
+
+  <!-- FLASHCARD SCREEN -->
+  <div id="flashcard-screen" class="screen">
+    <div class="stats-bar">
+      <div class="stat-cell">
+        <div class="val" id="fc-current">1</div>
+        <div class="lbl">Card</div>
+      </div>
+      <div class="stat-cell">
+        <div class="val" id="fc-total">0</div>
+        <div class="lbl">Total</div>
+      </div>
+      <div class="stat-cell">
+        <div class="val" id="fc-known">0</div>
+        <div class="lbl">Known</div>
+      </div>
+      <div class="stat-cell">
+        <div class="val" id="fc-study">0</div>
+        <div class="lbl">Study More</div>
+      </div>
+    </div>
+
+    <div class="flashcard-hint">CLICK CARD TO FLIP</div>
+
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="flashcard-inner" id="flashcard-inner">
+        <div class="flashcard-front">
+          <div class="fc-label">Term / Concept</div>
+          <div class="fc-term" id="fc-term"></div>
+        </div>
+        <div class="flashcard-back">
+          <div class="fc-def" id="fc-def"></div>
         </div>
       </div>
-      <div style={{borderTop:`1px solid ${C.border}`,padding:"8px 14px",display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
-        {!results
-          ?<button onClick={doCheck}
-             style={{fontSize:12,padding:"5px 14px",borderRadius:6,border:`1px solid ${C.border}`,background:C.text,color:"#fff",cursor:"pointer"}}>
-             Check
-           </button>
-          :<>
-            <Tag color={allOk?C.green:C.amber} bg={allOk?C.greenBg:C.amberBg}>{score}/{q.fields.length} correct</Tag>
-            <button onClick={reset} style={{fontSize:11,padding:"3px 9px",borderRadius:6,border:`1px solid ${C.border}`,background:"transparent",color:C.muted,cursor:"pointer",marginLeft:4}}>Retry</button>
-          </>
-        }
-      </div>
     </div>
-  );
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="rateCard('study')">📚 Study More</button>
+      <button class="btn-primary" onclick="rateCard('known')">✓ Got It</button>
+    </div>
+
+    <div class="btn-row" style="margin-top:0.5rem">
+      <button class="btn-secondary" onclick="showScreen('mode-screen')">← Menu</button>
+      <button class="btn-secondary" onclick="resetFlashcards()">↺ Restart</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen" class="screen">
+    <div class="results-label">EXAM COMPLETE</div>
+    <div class="results-grade" id="results-grade">—</div>
+    <div class="results-label" id="results-sublabel"></div>
+    <div class="results-msg" id="results-msg"></div>
+
+    <div id="missed-questions-list" class="missed-list" style="display:none">
+      <h3>🔴 Questions You Missed</h3>
+      <div id="missed-items"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showScreen('mode-screen')">← Menu</button>
+      <button class="btn-secondary" onclick="startQuiz('missed')">Drill Missed Topics</button>
+      <button class="btn-secondary" onclick="startQuiz('all')">Try Again</button>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  CCJ 462/563-001 · SIUC · SPRING 2026 · BUILT FOR EXAM PREP
+</footer>
+
+<script>
+// ============================================================
+// QUESTION BANK
+// ============================================================
+const QUESTIONS = [
+  // --- DATA SOURCES ---
+  {
+    category: "Crime Data Sources",
+    q: "Which crime data source is based on surveys of households rather than police reports, and therefore captures unreported crime?",
+    options: ["UCR","NIBRS","NCVS","FBI Crime Index"],
+    answer: 2,
+    explain: "The <strong>NCVS (National Crime Victimization Survey)</strong> surveys households directly. Because it captures crime whether or not it was reported to police, it reveals the 'dark figure of crime' that UCR misses."
+  },
+  {
+    category: "Crime Data Sources",
+    q: "The Uniform Crime Reports (UCR) relies primarily on which source of data?",
+    options: ["Victim self-reports","Hospital records","Police agency submissions","Court conviction records"],
+    answer: 2,
+    explain: "The <strong>UCR</strong> is compiled from data voluntarily submitted by law enforcement agencies across the country — it only captures crimes that come to police attention."
+  },
+  {
+    category: "Crime Data Sources",
+    q: "Which data system replaced the UCR's summary-based reporting with an incident-based approach that collects detailed info about each crime?",
+    options: ["NCVS","NIBRS","VAWA","BJS"],
+    answer: 1,
+    explain: "<strong>NIBRS (National Incident-Based Reporting System)</strong> collects details on each criminal incident — victim, offender, weapon, location, etc. — making it far more granular than the old UCR hierarchy rule."
+  },
+  {
+    category: "Crime Data Sources",
+    q: "The 'dark figure of crime' refers to:",
+    options: ["Crime committed by unknown offenders","Crime that is never reported to or recorded by authorities","Crime occurring after dark","Organized crime statistics"],
+    answer: 1,
+    explain: "The <strong>dark figure of crime</strong> is the gap between crime that occurs and crime that is officially recorded. The NCVS helps illuminate this by capturing unreported victimizations."
+  },
+
+  // --- HOMICIDE ---
+  {
+    category: "Homicide",
+    q: "Mike spends a week carefully planning and rehearsing how to kill Chad, then carries out the killing. This is an example of:",
+    options: ["Second-degree murder","Voluntary manslaughter","First-degree murder","Felony murder"],
+    answer: 2,
+    explain: "<strong>First-degree murder</strong> requires premeditation and deliberation. Mike's week of planning and practice is the textbook definition of premeditated, willful killing."
+  },
+  {
+    category: "Homicide",
+    q: "Jim breaks into Heather's house to steal jewelry. Not knowing she's home, he panics when she appears and pushes her down the stairs. She dies. This is:",
+    options: ["First-degree murder","Voluntary manslaughter","Involuntary manslaughter","Felony murder"],
+    answer: 3,
+    explain: "<strong>Felony murder</strong> — a death that occurs during the commission of a dangerous felony (here, burglary) holds the perpetrator liable for murder even without specific intent to kill."
+  },
+  {
+    category: "Homicide",
+    q: "Which type of homicide is defined as the 'purposeful, knowing, reckless, or negligent killing of one human being by another'?",
+    options: ["Manslaughter","Criminal homicide","Justifiable homicide","Excusable homicide"],
+    answer: 1,
+    explain: "<strong>Criminal homicide</strong> is the broad legal category encompassing purposeful, knowing, reckless, or negligent killing. It includes murder and manslaughter as subcategories."
+  },
+  {
+    category: "Homicide",
+    q: "Which group is statistically at highest risk of homicide victimization in the United States?",
+    options: ["White women over 50","Hispanic women under 30","Young Black men","Asian men over 40"],
+    answer: 2,
+    explain: "Research consistently shows <strong>young Black men</strong> face disproportionately high rates of homicide victimization, largely driven by concentrated disadvantage, structural inequality, and routine exposure to high-risk environments."
+  },
+
+  // --- RAPE / SEXUAL VICTIMIZATION ---
+  {
+    category: "Rape & Sexual Victimization",
+    q: "Connor's neighbor repeatedly touches him without his consent in his erogenous zone. This is best characterized as:",
+    options: ["Rape","Hostile work environment harassment","Sexual battery / sexual contact","Stalking"],
+    answer: 2,
+    explain: "<strong>Sexual battery / sexual contact</strong> involves unwanted touching of intimate body parts without penetration. This is distinct from rape (which requires penetration) and harassment (which typically involves workplace/verbal conduct)."
+  },
+  {
+    category: "Rape & Sexual Victimization",
+    q: "When Allison's boss makes sexual comments about her body, whistles at her, and says she's 'a good employee, for a woman,' this is an example of:",
+    options: ["Quid pro quo sexual harassment","Stalking","Hostile work environment harassment","Sexual battery"],
+    answer: 2,
+    explain: "<strong>Hostile work environment harassment</strong> occurs when unwelcome sexual conduct creates an intimidating, hostile, or offensive work environment. Quid pro quo would require a conditional trade (e.g., sex for a promotion)."
+  },
+  {
+    category: "Rape & Sexual Victimization",
+    q: "Which of the following is a known risk factor for rape victimization?",
+    options: ["Being employed full-time","Living in suburban areas","Alcohol and drug use in social settings","Being over age 50"],
+    answer: 2,
+    explain: "Research identifies <strong>alcohol and drug use</strong> — particularly in social/party settings — as a significant situational risk factor for rape victimization, increasing vulnerability by impairing judgment and resistance."
+  },
+  {
+    category: "Rape & Sexual Victimization",
+    q: "The majority of sexual assault perpetrators are:",
+    options: ["Strangers to the victim","Known to the victim","Convicted prior sex offenders","Older adults over 60"],
+    answer: 1,
+    explain: "Contrary to the 'stranger danger' myth, the vast majority of rape and sexual assault perpetrators are <strong>known to the victim</strong> — acquaintances, intimate partners, family members, or authority figures."
+  },
+
+  // --- STALKING ---
+  {
+    category: "Stalking",
+    q: "Some researchers critique the 'reasonable person' fear standard in stalking law because:",
+    options: ["It makes prosecution too easy","Women may experience a higher actual threat level than the standard accounts for, due to gendered patterns of violence","It focuses too much on victim behavior","It ignores repeated contact"],
+    answer: 1,
+    explain: "Critics argue the <strong>reasonable person standard</strong> may be gender-neutral in a way that underestimates women's fear — a reasonable woman who knows that stalking commonly escalates to violence may be more fearful, and that fear is rational, not excessive."
+  },
+  {
+    category: "Stalking",
+    q: "Which of the following is the most common pursuit behavior in stalking victimization?",
+    options: ["Following the victim in person","Showing up at the victim's home or workplace","Unwanted communication (calls, texts, messages, emails)","Sending gifts or letters"],
+    answer: 2,
+    explain: "<strong>Unwanted communication</strong> — repeated phone calls, texts, emails, and messages — is by far the most common stalking behavior. Physical following or showing up uninvited is less common but often escalates from communication."
+  },
+  {
+    category: "Stalking",
+    q: "Cyberstalking differs from traditional stalking primarily in that it:",
+    options: ["Is less frightening for victims","Never involves physical contact","Uses technology and online platforms to harass and monitor victims","Is not covered under most state stalking laws"],
+    answer: 2,
+    explain: "<strong>Cyberstalking</strong> uses digital platforms — social media, email, GPS tracking, spyware — to pursue and monitor victims. It can be just as terrifying as in-person stalking and often co-occurs with it."
+  },
+
+  // --- IPV ---
+  {
+    category: "Intimate Partner Violence",
+    q: "Which of the following best describes intimate partner violence (IPV)?",
+    options: ["Violence occurring only between married couples","Physical, sexual, psychological abuse or stalking between current or former intimate partners","Violence between siblings in the same household","Any assault occurring in a domestic setting"],
+    answer: 1,
+    explain: "<strong>IPV</strong> encompasses physical violence, sexual violence, stalking, and psychological aggression by a current or former intimate partner. It extends beyond marriage to dating relationships."
+  },
+  {
+    category: "Intimate Partner Violence",
+    q: "Which of the following is a consistent risk factor for IPV victimization?",
+    options: ["High education levels","Economic independence","Young age and economic disadvantage","Rural residency"],
+    answer: 2,
+    explain: "Research shows <strong>young age and economic disadvantage</strong> are among the strongest and most consistent predictors of IPV victimization. Financial dependency can trap victims in abusive relationships."
+  },
+  {
+    category: "Intimate Partner Violence",
+    q: "The 'cycle of violence' theory in IPV describes:",
+    options: ["How violence runs in families across generations","A pattern of tension building, acute explosion, reconciliation/'honeymoon' phase, and calm","A victim's tendency to instigate conflict","The escalating frequency of violent incidents over time"],
+    answer: 1,
+    explain: "Lenore Walker's <strong>cycle of violence</strong> model describes four phases: tension building → acute explosion → reconciliation/honeymoon → calm. Critics note it doesn't apply to all IPV relationships, but it remains influential."
+  },
+
+  // --- CHILD MALTREATMENT ---
+  {
+    category: "Child Maltreatment",
+    q: "Which form of child maltreatment is the most commonly reported to child protective services?",
+    options: ["Physical abuse","Sexual abuse","Neglect","Emotional abuse"],
+    answer: 2,
+    explain: "<strong>Neglect</strong> — failure to provide basic needs like food, shelter, supervision, medical care, or education — is the most frequently reported and substantiated form of child maltreatment, far exceeding physical or sexual abuse."
+  },
+  {
+    category: "Child Maltreatment",
+    q: "Which of the following is a known risk factor for child maltreatment perpetration?",
+    options: ["High parental education","Extended family support networks","Parental substance abuse and mental health problems","Child being school-age rather than infant"],
+    answer: 2,
+    explain: "<strong>Parental substance abuse and mental health problems</strong> are among the strongest predictors of child maltreatment. They impair parenting capacity and increase household stress, volatility, and neglect."
+  },
+  {
+    category: "Child Maltreatment",
+    q: "Child sexual abuse perpetrators are most commonly:",
+    options: ["Strangers","Known to the child, often in a position of trust","Peers of the same age","Online contacts only"],
+    answer: 1,
+    explain: "Like adult sexual victimization, child sexual abuse perpetrators are predominantly <strong>known to the child</strong> — family members, family friends, coaches, teachers, or other trusted adults. Stranger abuse exists but is less common."
+  },
+
+  // --- BULLYING ---
+  {
+    category: "Bullying",
+    q: "Which of the following best distinguishes bullying from other forms of peer aggression?",
+    options: ["Bullying always involves physical contact","Bullying requires a power imbalance and repeated behavior","Bullying only occurs at school","Bullying is limited to childhood"],
+    answer: 1,
+    explain: "<strong>Bullying</strong> is defined by three core elements: intent to harm, repetition over time, and a <strong>power imbalance</strong> between bully and victim. Without power imbalance and repetition, an act is peer conflict, not bullying."
+  },
+  {
+    category: "Bullying",
+    q: "Which group is at elevated risk for bullying victimization?",
+    options: ["Children with many close friends","LGBTQ+ youth and students with disabilities","Only overweight children","Children of high-income families"],
+    answer: 1,
+    explain: "Research consistently shows <strong>LGBTQ+ youth, students with disabilities, and those perceived as 'different'</strong> face significantly elevated rates of bullying victimization due to social marginalization and minority stress."
+  },
+
+  // --- RECURRING VICTIMIZATION ---
+  {
+    category: "Recurring Victimization",
+    q: "A victim experiences the same type of crime more than once, by what may be a different offender, at a later point in time. This is called:",
+    options: ["Series victimization","Repeat victimization","Revictimization","Polyvictimization"],
+    answer: 2,
+    explain: "<strong>Revictimization</strong> refers to experiencing the same type of victimization at a later point — often used when discussing childhood abuse survivors who experience adult assault. Distinct from repeat victimization (same offender) and series (6+ similar incidents)."
+  },
+  {
+    category: "Recurring Victimization",
+    q: "A person is victimized by both burglary and assault within the same year. This is an example of:",
+    options: ["Repeat victimization","Series victimization","Multiple victimization","Polyvictimization"],
+    answer: 2,
+    explain: "<strong>Multiple victimization</strong> refers to experiencing different types of crime. It differs from polyvictimization in that polyvictimization typically refers to children experiencing several different forms of maltreatment simultaneously."
+  },
+  {
+    category: "Recurring Victimization",
+    q: "A victim reports 8 similar incidents over 6 months but cannot recall distinct details of each. This is classified as:",
+    options: ["Polyvictimization","Repeat victimization","Series victimization","Revictimization"],
+    answer: 2,
+    explain: "<strong>Series victimization</strong> involves 6 or more similar victimizations in which the victim cannot distinguish individual incidents. The NCVS uses this category and captures them as a series rather than individual events."
+  },
+  {
+    category: "Recurring Victimization",
+    q: "A child experiences physical abuse, sexual abuse, and bullying within the same developmental period. This is best described as:",
+    options: ["Series victimization","Repeat victimization","Multiple victimization","Polyvictimization"],
+    answer: 3,
+    explain: "<strong>Polyvictimization</strong> — associated with David Finkelhor's research — refers to children experiencing multiple different forms of victimization. It has severe cumulative trauma effects and predicts worse outcomes than any single victimization type."
+  },
+  {
+    category: "Recurring Victimization",
+    q: "A challenge for victimologists studying crime-switching is that subsequent victimization:",
+    options: ["Always involves the same crime type","Is impossible to track with existing data","Can involve different crime types, making prediction difficult","Only occurs within 24 hours"],
+    answer: 2,
+    explain: "<strong>Crime-switching</strong> — where an offender targets the same victim but changes crime type — makes it difficult to predict and prevent recurring victimization because researchers and practitioners may be watching for the wrong crime type."
+  },
+
+  // --- BOOST / FLAG ---
+  {
+    category: "Boost vs. Flag Theory",
+    q: "State dependence theory (Boost Theory) argues that recurring victimization occurs because:",
+    options: ["Stable personal traits permanently elevate risk","The victimization event itself increases future vulnerability","Offenders act randomly","Neighborhoods, not individuals, predict victimization"],
+    answer: 1,
+    explain: "<strong>Boost/State Dependence Theory</strong>: the victimization event itself changes the victim's circumstances — broken locks aren't fixed, traumatic stress impairs judgment, offenders return knowing the target. The first victimization 'boosts' future risk."
+  },
+  {
+    category: "Boost vs. Flag Theory",
+    q: "Risk Heterogeneity (Flag Theory) argues that recurring victimization occurs because:",
+    options: ["Prior victimization creates new vulnerabilities","The same stable characteristics that led to the first victimization persist over time","Victims deliberately attract crime","Offenders remember specific targets"],
+    answer: 1,
+    explain: "<strong>Flag/Risk Heterogeneity Theory</strong>: people have stable characteristics (lifestyle, neighborhood, routine, social networks) that make them consistently higher-risk. The first victimization 'flags' underlying risk rather than creating new risk."
+  },
+  {
+    category: "Boost vs. Flag Theory",
+    q: "Can both Boost Theory and Flag Theory operate simultaneously?",
+    options: ["No — they are mutually exclusive explanations","Yes — a person can have stable high-risk traits AND have their risk boosted by a victimization event","Only in cases of domestic violence","Only for property crime, not personal crime"],
+    answer: 1,
+    explain: "Empirical evidence supports <strong>both explanations operating together</strong>. Someone may be flagged by poverty and neighborhood disadvantage AND simultaneously have their risk boosted when a burglary leaves their door unsecured and signals vulnerability to nearby offenders."
+  },
+  {
+    category: "Boost vs. Flag Theory",
+    q: "Which theory would predict that the highest-risk period for re-victimization is immediately after the first incident?",
+    options: ["Flag Theory","Boost Theory","Routine Activities Theory","Self-Control Theory"],
+    answer: 1,
+    explain: "<strong>Boost Theory</strong> predicts a spike in risk immediately after victimization because the event itself creates fresh vulnerabilities (known access points, traumatized victim, offender familiarity). Risk then decays over time as circumstances recover."
+  },
+
+  // --- FEAR OF VICTIMIZATION ---
+  {
+    category: "Fear of Victimization",
+    q: "The 'paradox of fear' in victimology refers to:",
+    options: ["Victims who deny their own fear","The finding that high-fear groups have the lowest actual victimization rates","People who fear crime more after moving to safer areas","The fact that fear causes crime"],
+    answer: 1,
+    explain: "The <strong>paradox of fear</strong>: elderly women report the highest fear of criminal victimization but have among the lowest actual victimization rates. Young men are victimized most but report the least fear. Fear doesn't track actual risk."
+  },
+  {
+    category: "Fear of Victimization",
+    q: "Perceived risk of victimization is best described as:",
+    options: ["An emotional response of feeling unsafe","A cognitive, rational estimate of the likelihood of being victimized","A measure of actual crime rates in one's neighborhood","The physical symptoms of anxiety during crime"],
+    answer: 1,
+    explain: "<strong>Perceived risk</strong> is a cognitive/rational judgment — 'I think there is a X% chance I will be victimized.' It is distinct from <strong>fear</strong>, which is the affective/emotional response of feeling unsafe."
+  },
+  {
+    category: "Fear of Victimization",
+    q: "Which best explains why someone might have HIGH perceived risk but LOW fear of victimization?",
+    options: ["They are in denial about their risk","They are trained professionals (e.g., police, ER workers) who intellectually assess risk but manage emotional response through experience","They live in a safe neighborhood","They have never been victimized"],
+    answer: 1,
+    explain: "Police officers, ER workers, and social workers may <strong>cognitively assess high risk</strong> in their daily work but have low emotional fear because training, experience, and professional routine help regulate the affective response."
+  },
+  {
+    category: "Fear of Victimization",
+    q: "Which best explains why someone might have LOW perceived risk but HIGH fear of victimization?",
+    options: ["They live in a high-crime area","They are elderly or feel physically vulnerable — their fear stems from perceived vulnerability, not accurate risk assessment","They have been victimized multiple times","They follow crime news obsessively"],
+    answer: 1,
+    explain: "An elderly woman in a safe suburb may have <strong>low actual and perceived risk</strong> but high fear because she perceives herself as physically vulnerable and unable to defend herself. Vulnerability perception — not actual risk — drives her fear."
+  },
+  {
+    category: "Fear of Victimization",
+    q: "When measuring fear of criminal victimization, researchers distinguish between 'expressive' and 'cognitive' components. The cognitive component corresponds to:",
+    options: ["The emotional feeling of being unsafe","Perceived risk — a rational probability estimate","Avoidance behavior","Physical symptoms of anxiety"],
+    answer: 1,
+    explain: "Researchers separate <strong>cognitive (perceived risk)</strong> from <strong>affective (emotional fear)</strong> components of fear. The cognitive component is about rational probability assessment; the affective component is about the feeling of being unsafe."
+  },
+
+  // --- CRIMINOLOGICAL THEORIES ---
+  {
+    category: "Criminological Theories",
+    q: "Routine Activities Theory identifies three elements that must converge for victimization to occur. Which answer correctly lists all three?",
+    options: ["Motive, opportunity, and means","Motivated offender, suitable target, and absence of capable guardianship","Poverty, low self-control, and social disorganization","Victim precipitation, opportunity, and motivated offender"],
+    answer: 1,
+    explain: "Cohen and Felson's <strong>Routine Activities Theory</strong> requires all three to converge in time and space: a <strong>motivated offender</strong>, a <strong>suitable target</strong>, and the <strong>absence of capable guardianship</strong>. Remove any one element and victimization is prevented."
+  },
+  {
+    category: "Criminological Theories",
+    q: "Gottfredson and Hirschi's Self-Control Theory is criticized for being tautological because:",
+    options: ["It was developed before crime statistics were available","Low self-control is both the cause of crime and defined by criminal behavior, making it circular","It ignores structural factors like poverty","It only applies to violent crime"],
+    answer: 1,
+    explain: "<strong>Tautological criticism</strong>: self-control theory defines low self-control partly by criminal behavior, then uses it to explain criminal behavior. Critics argue this makes the theory unfalsifiable — it explains crime by crime."
+  },
+  {
+    category: "Criminological Theories",
+    q: "What 'value added' do criminological theories like self-control theory provide beyond the opportunity approach?",
+    options: ["They identify where crimes occur","They explain WHY certain individuals place themselves in high-opportunity situations in the first place","They are easier to test statistically","They focus on offender motivation rather than victim behavior"],
+    answer: 1,
+    explain: "Opportunity theories explain <strong>where and when</strong> victimization occurs, but don't explain why certain people consistently find themselves in high-risk situations. Self-control theory adds that <strong>individual traits</strong> drive the routines that create opportunity — explaining person-level patterns."
+  },
+  {
+    category: "Criminological Theories",
+    q: "Lifestyle-Exposure Theory suggests that victimization risk is tied to:",
+    options: ["A victim's moral character","Daily patterns of behavior — work, leisure, and social activities — that affect exposure to potential offenders","Neighborhood crime rates alone","Victim's genetic predisposition"],
+    answer: 1,
+    explain: "<strong>Lifestyle-Exposure Theory</strong> (Hindelang, Gottfredson & Garofalo) argues that victimization risk is a function of lifestyle choices that bring individuals into contact with motivated offenders — nighttime activities, associations with deviant peers, and unstructured socializing."
+  },
+
+  // --- PERSONAL VICTIMIZATION ---
+  {
+    category: "Personal Victimization",
+    q: "Which demographic group consistently experiences the highest overall rates of personal victimization?",
+    options: ["Elderly men","Young adults ages 18–24","Women over 50","Children under 12"],
+    answer: 1,
+    explain: "NCVS data consistently shows <strong>young adults 18–24</strong> have the highest rates of violent victimization. This is explained by their lifestyle patterns — more time in public spaces, nighttime activity, and social settings that increase exposure to motivated offenders."
+  },
+  {
+    category: "Personal Victimization",
+    q: "Which of the following is NOT typically identified as a risk factor for personal victimization?",
+    options: ["Low income and economic disadvantage","Unstructured socializing with peers","High educational attainment","Living in high-crime neighborhoods"],
+    answer: 2,
+    explain: "<strong>High educational attainment</strong> is generally associated with lower victimization risk — it correlates with stable employment, higher income neighborhoods, and routines that reduce high-risk exposure. The other three are established risk factors."
+  },
+];
+
+// ============================================================
+// FLASHCARDS
+// ============================================================
+const FLASHCARDS = [
+  { term: "NCVS", def: "National Crime Victimization Survey — surveys households to capture both reported and unreported crime. Best source for the 'dark figure of crime.'" },
+  { term: "UCR", def: "Uniform Crime Reports — compiled from police agency submissions. Only captures crimes reported to law enforcement." },
+  { term: "NIBRS", def: "National Incident-Based Reporting System — incident-level data system replacing UCR. Captures detailed info on each criminal event." },
+  { term: "Dark Figure of Crime", def: "Crime that occurs but is never reported to or recorded by authorities. NCVS helps illuminate this gap." },
+  { term: "First-Degree Murder", def: "Willful, deliberate, and premeditated killing. Requires planning and intent. Mike planning Chad's death for a week = first-degree." },
+  { term: "Felony Murder", def: "A death that occurs during commission of a dangerous felony. Perpetrator is liable for murder even without intent to kill. Jim/Heather scenario." },
+  { term: "Repeat Victimization", def: "The same victim experiences the same type of crime, often by the same offender, more than once." },
+  { term: "Revictimization", def: "Being victimized by the same crime type at a later point in time, possibly by a different offender. Common in DV survivors." },
+  { term: "Multiple Victimization", def: "Experiencing different types of crime (e.g., burglary AND assault in the same year)." },
+  { term: "Polyvictimization", def: "Children experiencing several different forms of maltreatment simultaneously. Associated with severe cumulative trauma." },
+  { term: "Series Victimization", def: "Six or more similar incidents in which the victim cannot recall individual events separately." },
+  { term: "Boost Theory (State Dependence)", def: "The victimization event itself creates new vulnerabilities — broken locks, traumatized victim, offender familiarity. Risk peaks right after first incident." },
+  { term: "Flag Theory (Risk Heterogeneity)", def: "Stable pre-existing characteristics (lifestyle, neighborhood, routine) make certain people consistently higher-risk regardless of victimization history." },
+  { term: "Paradox of Fear", def: "Groups with the LOWEST actual victimization risk (elderly women) report the HIGHEST fear. Young men victimized most but fear least." },
+  { term: "Perceived Risk of Victimization", def: "A COGNITIVE/rational estimate of the likelihood of being victimized. Different from fear, which is emotional/affective." },
+  { term: "Fear of Victimization", def: "An EMOTIONAL/affective response — the feeling of being unsafe. Distinct from perceived risk (rational probability estimate)." },
+  { term: "Routine Activities Theory", def: "Victimization requires convergence of: (1) motivated offender, (2) suitable target, and (3) absence of capable guardianship." },
+  { term: "Lifestyle-Exposure Theory", def: "Daily behavioral patterns (work, leisure, social activities) affect exposure to potential offenders and thus victimization risk." },
+  { term: "Self-Control Theory", def: "Gottfredson & Hirschi — low self-control predicts both offending AND victimization. Criticized as tautological." },
+  { term: "Hostile Work Environment Harassment", def: "Unwelcome sexual conduct that creates an intimidating, hostile, or offensive work environment. Allison's boss scenario." },
+  { term: "Quid Pro Quo Harassment", def: "Sexual favors demanded as a condition of employment benefits. 'Sleep with me or you're fired.'" },
+  { term: "Sexual Battery / Sexual Contact", def: "Unwanted touching of intimate body parts without penetration. Distinct from rape. Connor's neighbor scenario." },
+  { term: "Stalking: Reasonable Person Standard", def: "Requires that a reasonable person would fear the conduct. Criticized because it may underestimate women's rational fear given gendered violence patterns." },
+  { term: "Cycle of Violence (IPV)", def: "Walker's four phases: tension building → acute explosion → reconciliation/honeymoon → calm. Not universal to all IPV relationships." },
+  { term: "Felony Murder Rule", def: "Legal doctrine holding a defendant liable for murder when a death occurs during commission of a dangerous felony, regardless of intent." },
+  { term: "Crime-Switching", def: "When an offender targets the same victim but changes crime type, making prediction and prevention more difficult for victimologists." },
+  { term: "Polyvictimization (Finkelhor)", def: "David Finkelhor's concept: children experiencing multiple different forms of victimization. Predicts worse outcomes than any single type alone." },
+  { term: "Tautology Criticism of Self-Control Theory", def: "Low self-control is defined partly by criminal behavior, then used to explain criminal behavior — making it circular and difficult to falsify." },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentQuestions = [];
+let currentIndex = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let answered = false;
+let missedQuestions = [];
+let weakCategories = {};
+let sessionHistory = JSON.parse(localStorage.getItem('ccj462_weak') || '{}');
+
+let fcIndex = 0;
+let fcKnown = 0;
+let fcStudyMore = 0;
+let fcDeck = [];
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
-function Progress({mcs,frs}){
-  const mcRight=Object.values(mcs).filter(v=>v===true).length;
-  const mcDone=Object.values(mcs).filter(v=>v!==null).length;
-  const frTotal=FR_QUESTIONS.reduce((a,q)=>a+q.fields.length,0);
-  const frRight=Object.values(frs).reduce((a,v)=>a+(v||0),0);
-  const frDone=Object.values(frs).filter(v=>v!==null).length;
-  const cells=[
-    ["MC correct",`${mcRight} / ${MC_QUESTIONS.length}`],
-    ["MC attempted",`${mcDone} / ${MC_QUESTIONS.length}`],
-    ["FR fields",`${frRight} / ${frTotal}`],
-    ["FR attempted",`${frDone} / ${FR_QUESTIONS.length}`],
-  ];
-  return (
-    <div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:12}}>
-        {cells.map(([l,v])=>(
-          <div key={l} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 12px"}}>
-            <div style={{fontSize:11,color:C.muted,marginBottom:3}}>{l}</div>
-            <div style={{fontSize:22,fontWeight:500,color:C.text}}>{v}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{fontSize:12,color:C.muted}}>Scores save automatically. Use "Reset all" on the header for a clean timed run.</div>
-    </div>
-  );
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'mode-screen') refreshWeakSpots();
 }
 
-function App(){
-  const [tab,setTab]=useState("mc");
-  const [mcs,setMcs]=useState({});
-  const [mcSaved,setMcSaved]=useState({});
-  const [frs,setFrs]=useState({});
-  const [frSaved,setFrSaved]=useState({});
+function refreshWeakSpots() {
+  const home = document.getElementById('weak-spots-home');
+  const tags = document.getElementById('weak-tags-home');
+  const cats = Object.keys(sessionHistory).filter(c => sessionHistory[c] > 0);
+  if (cats.length === 0) { home.style.display = 'none'; return; }
+  home.style.display = 'block';
+  tags.innerHTML = cats.map(c => `<span class="weak-tag">${c} (${sessionHistory[c]})</span>`).join('');
+}
 
-  useEffect(()=>{
-    const s=loadState();
-    if(s.mcs)setMcs(s.mcs);
-    if(s.mcSaved)setMcSaved(s.mcSaved);
-    if(s.frs)setFrs(s.frs);
-    if(s.frSaved)setFrSaved(s.frSaved);
-  },[]);
+// ============================================================
+// QUIZ
+// ============================================================
+function startQuiz(mode) {
+  correctCount = 0;
+  wrongCount = 0;
+  currentIndex = 0;
+  missedQuestions = [];
+  answered = false;
 
-  function hmc(id,correct,data){
-    const nm={...mcs,[id]:correct},nd={...mcSaved,[id]:data};
-    setMcs(nm);setMcSaved(nd);
-    saveState({mcs:nm,mcSaved:nd,frs,frSaved});
+  if (mode === 'all') {
+    currentQuestions = shuffle(QUESTIONS);
+  } else if (mode === 'missed') {
+    const cats = Object.keys(sessionHistory).filter(c => sessionHistory[c] > 0);
+    if (cats.length === 0) {
+      currentQuestions = shuffle(QUESTIONS);
+    } else {
+      currentQuestions = shuffle(QUESTIONS.filter(q => cats.includes(q.category)));
+    }
+  } else if (mode === 'category') {
+    showCategoryScreen();
+    return;
   }
-  function hfr(id,score,total,data){
-    const nm={...frs,[id]:score},nd={...frSaved,[id]:data};
-    setFrs(nm);setFrSaved(nd);
-    saveState({mcs,mcSaved,frs:nm,frSaved:nd});
-  }
-  function resetAll(){setMcs({});setMcSaved({});setFrs({});setFrSaved({});saveState({});}
 
-  const tabs=[["mc","Multiple Choice"],["fr","Free Response"],["prog","Progress"]];
+  showScreen('quiz-screen');
+  renderQuestion();
+}
 
-  return (
-    <div style={{maxWidth:720,margin:"0 auto",fontFamily:"system-ui,sans-serif"}}>
-      {/* Header */}
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:8}}>
-        <div>
-          <div style={{fontSize:17,fontWeight:600,color:C.text}}>MATH 282 — Practice Exam</div>
-          <div style={{fontSize:12,color:C.muted}}>Spring 2025 · Final exam Monday May 5, 12:30–2:30 PM · Row D</div>
-        </div>
-        <button onClick={resetAll} style={{fontSize:11,padding:"4px 10px",borderRadius:6,border:`1px solid ${C.border}`,background:"transparent",color:C.muted,cursor:"pointer"}}>Reset all</button>
-      </div>
+function showCategoryScreen() {
+  const cats = [...new Set(QUESTIONS.map(q => q.category))];
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = cats.map(c => `
+    <div class="mode-card" onclick="startQuizCategory('${c}')">
+      <div class="mode-icon">📌</div>
+      <div class="mode-title">${c}</div>
+      <div class="mode-desc">${QUESTIONS.filter(q=>q.category===c).length} questions</div>
+    </div>
+  `).join('');
+  showScreen('category-screen');
+}
 
-      {/* Tabs */}
-      <div style={{display:"flex",gap:0,marginBottom:16,borderBottom:`1px solid ${C.border}`}}>
-        {tabs.map(([id,label])=>(
-          <button key={id} onClick={()=>setTab(id)}
-            style={{fontSize:13,padding:"8px 16px",border:"none",borderBottom:tab===id?`2px solid ${C.text}`:"2px solid transparent",
-                    background:"transparent",color:tab===id?C.text:C.muted,cursor:"pointer",fontWeight:tab===id?500:400,marginBottom:-1}}>
-            {label}
+function startQuizCategory(cat) {
+  correctCount = 0; wrongCount = 0; currentIndex = 0; missedQuestions = []; answered = false;
+  currentQuestions = shuffle(QUESTIONS.filter(q => q.category === cat));
+  showScreen('quiz-screen');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const total = currentQuestions.length;
+  const pct = total > 0 ? Math.round((currentIndex / total) * 100) : 0;
+  document.getElementById('stat-q').textContent = currentIndex + 1;
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-wrong').textContent = wrongCount;
+  const scorePct = (currentIndex > 0) ? Math.round((correctCount / currentIndex) * 100) : '—';
+  document.getElementById('stat-pct').textContent = scorePct === '—' ? '—' : scorePct + '%';
+  document.getElementById('prog-label').textContent = `Question ${currentIndex + 1} of ${total}`;
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  const q = currentQuestions[currentIndex];
+  const letters = ['A','B','C','D'];
+
+  const html = `
+    <div class="question-card">
+      <div class="category-tag">${q.category}</div>
+      <div class="q-number">QUESTION ${currentIndex + 1} OF ${total}</div>
+      <div class="question-text">${q.q}</div>
+      <div class="options" id="options-list">
+        ${q.options.map((opt, i) => `
+          <button class="option-btn" id="opt-${i}" onclick="selectAnswer(${i})">
+            <span class="option-letter">${letters[i]}</span>
+            <span>${opt}</span>
           </button>
-        ))}
+        `).join('')}
       </div>
-
-      {tab==="mc"&&(
-        <div>
-          <div style={{fontSize:12,color:C.muted,marginBottom:12}}>15 questions · Select an answer then tap Check · Explanation reveals after each attempt.</div>
-          {MC_QUESTIONS.map(q=><MCCard key={q.id} q={q} onScore={hmc} saved={mcSaved[q.id]}/>)}
-        </div>
-      )}
-
-      {tab==="fr"&&(
-        <div>
-          <div style={{fontSize:12,color:C.muted,marginBottom:12}}>Type your answer and tap Check · Keep 3 decimal places · Correct answer shown on miss.</div>
-          {FR_QUESTIONS.map(q=><FRCard key={q.id} q={q} onScore={hfr} saved={frSaved[q.id]}/>)}
-        </div>
-      )}
-
-      {tab==="prog"&&<Progress mcs={mcs} frs={frs}/>}
+      <div class="feedback-flash" id="feedback-flash"></div>
+      <div class="explanation" id="explanation">${q.explain}</div>
     </div>
-  );
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">
+      ${currentIndex + 1 < total ? 'NEXT QUESTION →' : 'SEE RESULTS →'}
+    </button>
+  `;
+
+  document.getElementById('question-area').innerHTML = html;
+  answered = false;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+function selectAnswer(chosen) {
+  if (answered) return;
+  answered = true;
+
+  const q = currentQuestions[currentIndex];
+  const correct = q.answer;
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const flash = document.getElementById('feedback-flash');
+  const explanation = document.getElementById('explanation');
+
+  if (chosen === correct) {
+    btns[chosen].classList.add('correct');
+    flash.textContent = '✓ CORRECT';
+    flash.className = 'feedback-flash show correct-flash';
+    correctCount++;
+  } else {
+    btns[chosen].classList.add('wrong');
+    btns[correct].classList.add('correct');
+    flash.textContent = '✗ WRONG';
+    flash.className = 'feedback-flash show wrong-flash';
+    wrongCount++;
+    missedQuestions.push({ q: q.q, your: q.options[chosen], correct: q.options[correct] });
+    sessionHistory[q.category] = (sessionHistory[q.category] || 0) + 1;
+    localStorage.setItem('ccj462_weak', JSON.stringify(sessionHistory));
+  }
+
+  explanation.classList.add('show');
+  document.getElementById('next-btn').classList.add('show');
+
+  // Update stats
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-wrong').textContent = wrongCount;
+  const scorePct = Math.round((correctCount / (currentIndex + 1)) * 100);
+  document.getElementById('stat-pct').textContent = scorePct + '%';
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentQuestions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  showScreen('results-screen');
+  const total = currentQuestions.length;
+  const pct = Math.round((correctCount / total) * 100);
+  const gradeEl = document.getElementById('results-grade');
+  const msgEl = document.getElementById('results-msg');
+
+  gradeEl.textContent = pct + '%';
+
+  if (pct >= 90) {
+    gradeEl.style.color = 'var(--green)';
+    msgEl.textContent = "That's an A. You know this material. Go get some sleep.";
+  } else if (pct >= 80) {
+    gradeEl.style.color = 'var(--accent)';
+    msgEl.textContent = "Solid B. You've got the foundations — drill your weak spots and you're ready.";
+  } else if (pct >= 70) {
+    gradeEl.style.color = 'var(--accent)';
+    msgEl.textContent = "C territory. Review the categories you missed and run through again. You've got time.";
+  } else {
+    gradeEl.style.color = 'var(--red)';
+    msgEl.textContent = "Below 70. Don't panic — use the Weak Spots mode to target exactly what's hurting you. This is what practice is for.";
+  }
+
+  document.getElementById('results-sublabel').textContent = `${correctCount} CORRECT · ${wrongCount} WRONG · ${total} TOTAL`;
+
+  if (missedQuestions.length > 0) {
+    const list = document.getElementById('missed-items');
+    list.innerHTML = missedQuestions.map(m => `
+      <div class="missed-item">
+        <div class="mi-q">${m.q}</div>
+        <div class="mi-your">✗ Your answer: ${m.your}</div>
+        <div class="mi-correct">✓ Correct: ${m.correct}</div>
+      </div>
+    `).join('');
+    document.getElementById('missed-questions-list').style.display = 'block';
+  }
+}
+
+// ============================================================
+// FLASHCARDS
+// ============================================================
+function initFlashcards() {
+  fcDeck = shuffle(FLASHCARDS);
+  fcIndex = 0; fcKnown = 0; fcStudyMore = 0;
+  updateFC();
+}
+
+function resetFlashcards() { initFlashcards(); }
+
+function updateFC() {
+  if (fcIndex >= fcDeck.length) {
+    document.getElementById('fc-term').textContent = '🎉 Deck Complete!';
+    document.getElementById('fc-def').textContent = `Known: ${fcKnown} · Study More: ${fcStudyMore}. Restart to go again.`;
+    document.getElementById('flashcard').classList.remove('flipped');
+    return;
+  }
+  const card = fcDeck[fcIndex];
+  document.getElementById('fc-term').textContent = card.term;
+  document.getElementById('fc-def').textContent = card.def;
+  document.getElementById('fc-current').textContent = fcIndex + 1;
+  document.getElementById('fc-total').textContent = fcDeck.length;
+  document.getElementById('fc-known').textContent = fcKnown;
+  document.getElementById('fc-study').textContent = fcStudyMore;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function rateCard(rating) {
+  if (fcIndex >= fcDeck.length) return;
+  if (rating === 'known') fcKnown++;
+  else fcStudyMore++;
+  fcIndex++;
+  updateFC();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+refreshWeakSpots();
 </script>
 </body>
 </html>
