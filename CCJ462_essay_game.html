@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCJ 462 — Essay Mastery Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inconsolata:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --surface: #ede8dc;
+  --card: #ffffff;
+  --border: #d4cdc0;
+  --ink: #1a1714;
+  --muted: #7a7368;
+  --accent: #c0392b;
+  --accent2: #2563a8;
+  --gold: #b8860b;
+  --green: #1a6b3a;
+  --shadow: rgba(26,23,20,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 17px;
+  min-height: 100vh;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(26,23,20,0.04) 28px);
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* HEADER */
+.site-header {
+  text-align: center;
+  padding: 2.5rem 0 2rem;
+  border-bottom: 3px double var(--border);
+  margin-bottom: 2.5rem;
+}
+
+.header-eyebrow {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.site-header h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.2rem, 7vw, 4rem);
+  line-height: 1.0;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+
+.site-header h1 .accent { color: var(--accent); }
+
+.header-sub {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  margin-top: 0.5rem;
+}
+
+/* SCORE STRIP */
+.score-strip {
+  display: flex;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.score-cell {
+  flex: 1;
+  background: var(--surface);
+  padding: 0.85rem 0.5rem;
+  text-align: center;
+}
+
+.score-cell .sv {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.score-cell .sl {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.58rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-top: 0.2rem;
+}
+
+/* SCREENS */
+.screen { display: none; }
+.screen.active { display: block; animation: pageIn 0.3s ease; }
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* MODE SELECT */
+.mode-intro {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mode-intro h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.mode-intro p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.mode-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 2px 3px 0 var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.mode-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+  transform-origin: bottom;
+}
+
+.mode-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 5px 0 var(--border);
+}
+
+.mode-card:hover::before { transform: scaleY(1); }
+
+.mode-icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+
+.mode-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+
+.mode-desc {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+}
+
+.mode-badge {
+  position: absolute;
+  top: 0.6rem; right: 0.6rem;
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.55rem;
+  background: var(--accent);
+  color: white;
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ESSAY REFERENCE PANEL */
+.essay-ref {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  box-shadow: 2px 3px 0 var(--border);
+}
+
+.essay-ref-header {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0.75rem 1.25rem;
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.essay-ref-body {
+  display: none;
+  padding: 1.25rem;
+}
+
+.essay-ref-body.open { display: block; }
+
+.essay-block {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.essay-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.essay-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.essay-point {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink);
+  padding-left: 1rem;
+  border-left: 2px solid var(--border);
+  margin-bottom: 0.4rem;
+}
+
+/* GAME CARD */
+.game-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2rem 2rem 1.75rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 3px 4px 0 var(--border);
+  position: relative;
+}
+
+.game-label {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.game-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.game-prompt {
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+
+.game-prompt em {
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* SORT GAME */
+.sort-zones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.sort-zone {
+  min-height: 120px;
+  border: 2px dashed var(--border);
+  border-radius: 4px;
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.sort-zone.drag-over {
+  border-color: var(--accent);
+  background: rgba(192,57,43,0.04);
+}
+
+.sort-zone-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sort-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  min-height: 60px;
+  margin-bottom: 1rem;
+}
+
+.sort-chip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.82rem;
+  font-family: 'Lora', serif;
+  cursor: grab;
+  transition: all 0.15s ease;
+  box-shadow: 1px 1px 0 var(--border);
+  user-select: none;
+}
+
+.sort-chip:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 2px 2px 0 var(--border);
+}
+
+.sort-chip.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.sort-chip.placed-correct {
+  border-color: var(--green);
+  background: rgba(26,107,58,0.06);
+  color: var(--green);
+  cursor: default;
+}
+
+.sort-chip.placed-wrong {
+  border-color: var(--accent);
+  background: rgba(192,57,43,0.06);
+  color: var(--accent);
+}
+
+/* FILL BLANK */
+.fill-sentence {
+  font-size: 1.05rem;
+  line-height: 2.2;
+  color: var(--ink);
+}
+
+.blank-input {
+  display: inline-block;
+  min-width: 160px;
+  border: none;
+  border-bottom: 2px solid var(--ink);
+  background: transparent;
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  color: var(--accent);
+  font-weight: 600;
+  padding: 0 0.25rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+  vertical-align: bottom;
+}
+
+.blank-input:focus { border-color: var(--accent2); }
+.blank-input.correct-input { border-color: var(--green); color: var(--green); }
+.blank-input.wrong-input { border-color: var(--accent); color: var(--accent); }
+
+/* WHICH THEORY */
+.theory-chips {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.theory-chip {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  letter-spacing: 0.04em;
+}
+
+.theory-chip:hover { border-color: var(--accent2); background: rgba(37,99,168,0.05); }
+.theory-chip.selected-correct { border-color: var(--green); background: rgba(26,107,58,0.08); color: var(--green); }
+.theory-chip.selected-wrong { border-color: var(--accent); background: rgba(192,57,43,0.08); color: var(--accent); }
+.theory-chip.reveal-correct { border-color: var(--green); background: rgba(26,107,58,0.08); color: var(--green); }
+.theory-chip:disabled { cursor: default; }
+
+/* RECALL */
+.recall-box {
+  width: 100%;
+  min-height: 140px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--ink);
+  background: var(--surface);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.recall-box:focus { border-color: var(--accent2); }
+
+.key-points-reveal {
+  margin-top: 1.25rem;
+  display: none;
+}
+
+.key-points-reveal.show { display: block; animation: pageIn 0.3s ease; }
+
+.kp-header {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+
+.kp-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.kp-check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.8rem;
+  margin-top: 0.1rem;
+}
+
+.kp-check.checked {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+/* FEEDBACK */
+.feedback-box {
+  margin-top: 1rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 3px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  display: none;
+  animation: pageIn 0.25s ease;
+}
+
+.feedback-box.show { display: block; }
+.feedback-box.correct { background: rgba(26,107,58,0.07); border-left: 3px solid var(--green); color: var(--green); }
+.feedback-box.wrong { background: rgba(192,57,43,0.07); border-left: 3px solid var(--accent); color: var(--accent); }
+.feedback-box.info { background: rgba(37,99,168,0.07); border-left: 3px solid var(--accent2); color: var(--ink); }
+
+.feedback-box strong { font-weight: 600; }
+
+/* PROGRESS */
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.progress-label {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pbar { height: 2px; background: var(--border); border-radius: 1px; margin-bottom: 1.5rem; }
+.pbar-fill { height: 100%; background: var(--accent); border-radius: 1px; transition: width 0.4s ease; }
+
+/* BUTTONS */
+.btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.25rem; }
+
+.btn {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  border: 2px solid;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+  box-shadow: 3px 3px 0 var(--muted);
+}
+
+.btn-primary:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--muted);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+.btn-secondary:hover { border-color: var(--ink); }
+
+.btn-accent {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  box-shadow: 3px 3px 0 rgba(192,57,43,0.3);
+}
+
+.btn-accent:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(192,57,43,0.3); }
+
+/* RESULTS */
+.result-banner {
+  text-align: center;
+  padding: 3rem 0 2rem;
+}
+
+.result-score {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(4rem,15vw,8rem);
+  line-height: 1;
+  color: var(--accent);
+  margin: 0.5rem 0;
+}
+
+.result-msg {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin: 1rem auto 2rem;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+/* STREAK */
+.streak-bar {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.streak-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.3s ease;
+}
+
+.streak-dot.hit { background: var(--green); }
+.streak-dot.miss { background: var(--accent); }
+
+/* TIMER */
+.timer-ring {
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-align: right;
+  margin-bottom: 0.5rem;
+}
+
+/* ESSAY MAP */
+.essay-map {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.essay-map-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.25rem;
+  box-shadow: 2px 3px 0 var(--border);
+}
+
+.emc-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 2rem;
+  color: var(--border);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.emc-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.emc-mastery {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.emc-mastery-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+@media (max-width: 600px) {
+  .sort-zones { grid-template-columns: 1fr; }
+  .essay-map { grid-template-columns: 1fr; }
+  .theory-chips { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="site-header">
+  <div class="header-eyebrow">CCJ 462 / 563-001 · Essay Mastery Lab</div>
+  <h1>LOCK IT <span class="accent">IN</span></h1>
+  <div class="header-sub">THREE ESSAYS · FOUR GAME MODES · ZERO EXCUSES</div>
+</header>
+
+<div class="score-strip">
+  <div class="score-cell"><div class="sv" id="g-pts">0</div><div class="sl">Points</div></div>
+  <div class="score-cell"><div class="sv" id="g-streak">0</div><div class="sl">Streak</div></div>
+  <div class="score-cell"><div class="sv" id="g-correct">0</div><div class="sl">Correct</div></div>
+  <div class="score-cell"><div class="sv" id="g-mastery">0%</div><div class="sl">Mastery</div></div>
+</div>
+
+<!-- CHEAT SHEET TOGGLE -->
+<div class="essay-ref">
+  <div class="essay-ref-header" onclick="toggleRef()">
+    <span>📋 ESSAY CHEAT SHEET — REFERENCE PANEL</span>
+    <span id="ref-toggle-label">SHOW ▾</span>
+  </div>
+  <div class="essay-ref-body" id="ref-body">
+    <div class="essay-block">
+      <div class="essay-num">Essay 1 — Recurring Victimization: Boost vs. Flag</div>
+      <div class="essay-point"><strong>Boost (State Dependence):</strong> The victimization event itself creates new vulnerability — offender learns your routine, trauma impairs judgment, locks stay broken.</div>
+      <div class="essay-point"><strong>Flag (Risk Heterogeneity):</strong> Pre-existing stable conditions (poverty, neighborhood, lifestyle) flag you as a target regardless of prior victimization.</div>
+      <div class="essay-point"><strong>(c) Both can operate simultaneously</strong> — someone flagged by poverty AND boosted after a burglary.</div>
+      <div class="essay-point"><strong>(d) Neither is universally better</strong> — empirical evidence supports both; context determines which dominates.</div>
+    </div>
+    <div class="essay-block">
+      <div class="essay-num">Essay 2 — Perceived Risk vs. Fear</div>
+      <div class="essay-point"><strong>Perceived risk</strong> = cognitive/rational estimate ("I think I might be victimized").</div>
+      <div class="essay-point"><strong>Fear</strong> = emotional/affective response ("I feel unsafe").</div>
+      <div class="essay-point"><strong>High risk, low fear:</strong> Cops, ER workers — they assess risk rationally but manage the emotion through experience.</div>
+      <div class="essay-point"><strong>High fear, low risk:</strong> Elderly woman in safe suburb — fear driven by vulnerability perception, not actual odds.</div>
+      <div class="essay-point">Related but not the same dimension — one is cognitive, one is affective.</div>
+    </div>
+    <div class="essay-block">
+      <div class="essay-num">Essay 3 — Criminological Theories + Opportunity</div>
+      <div class="essay-point"><strong>Strength of self-control theory:</strong> Explains impulsivity of both victims AND offenders.</div>
+      <div class="essay-point"><strong>Weakness:</strong> Tautological — low self-control explains everything, hard to falsify.</div>
+      <div class="essay-point"><strong>Value added beyond opportunity:</strong> Opportunity tells you where/when. Theory tells you WHY certain people put themselves there in the first place.</div>
+      <div class="essay-point"><strong>Example:</strong> Routine Activities explains the convergence. Self-control explains why someone is out at 2am in a high-crime area without a capable guardian.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODE SELECT -->
+<div id="mode-screen" class="screen active">
+  <div class="mode-intro">
+    <h2>Choose Your Game</h2>
+    <p>Each mode locks in the essays from a different angle. Run all four.</p>
+  </div>
+
+  <div class="essay-map">
+    <div class="essay-map-card">
+      <div class="emc-num">01</div>
+      <div class="emc-title">Boost vs. Flag</div>
+      <div class="emc-mastery"><div class="emc-mastery-fill" id="mastery-e1" style="width:0%"></div></div>
+    </div>
+    <div class="essay-map-card">
+      <div class="emc-num">02</div>
+      <div class="emc-title">Risk vs. Fear</div>
+      <div class="emc-mastery"><div class="emc-mastery-fill" id="mastery-e2" style="width:0%"></div></div>
+    </div>
+    <div class="essay-map-card">
+      <div class="emc-num">03</div>
+      <div class="emc-title">Theory + Opportunity</div>
+      <div class="emc-mastery"><div class="emc-mastery-fill" id="mastery-e3" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="mode-grid">
+    <div class="mode-card" onclick="startMode('which')">
+      <div class="mode-badge">Fast</div>
+      <div class="mode-icon">⚡</div>
+      <div class="mode-title">Which Theory?</div>
+      <div class="mode-desc">A statement appears. You pick which essay concept it belongs to. Fast, instinct-building reps.</div>
+    </div>
+    <div class="mode-card" onclick="startMode('sort')">
+      <div class="mode-icon">🗂</div>
+      <div class="mode-title">Concept Sort</div>
+      <div class="mode-desc">Drag statements into the right theory bucket. Forces you to distinguish Boost from Flag, Risk from Fear.</div>
+    </div>
+    <div class="mode-card" onclick="startMode('fill')">
+      <div class="mode-icon">✏️</div>
+      <div class="mode-title">Fill the Gap</div>
+      <div class="mode-desc">Key sentences with blanks. Type the missing concept. Builds precise vocabulary for exam writing.</div>
+    </div>
+    <div class="mode-card" onclick="startMode('recall')">
+      <div class="mode-icon">🧠</div>
+      <div class="mode-title">Free Recall</div>
+      <div class="mode-desc">An essay prompt appears. You write what you remember, then self-score against the key points. Closest to the real exam.</div>
+    </div>
+  </div>
+</div>
+
+<!-- WHICH THEORY SCREEN -->
+<div id="which-screen" class="screen">
+  <div class="progress-row">
+    <span class="progress-label" id="wt-prog-label">1 of 0</span>
+    <span class="progress-label" id="wt-streak-label">Streak: 0</span>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="wt-pbar" style="width:0%"></div></div>
+  <div class="streak-bar" id="wt-streak-dots"></div>
+
+  <div class="game-card">
+    <div class="game-label">Which Theory / Concept?</div>
+    <div class="game-prompt" id="wt-prompt"></div>
+    <div class="theory-chips" id="wt-choices"></div>
+    <div class="feedback-box" id="wt-feedback"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="showScreen('mode-screen')">← Menu</button>
+    <button class="btn btn-primary" id="wt-next" onclick="wtNext()" style="display:none">Next →</button>
+  </div>
+</div>
+
+<!-- SORT SCREEN -->
+<div id="sort-screen" class="screen">
+  <div class="progress-row">
+    <span class="progress-label" id="sort-prog-label">Round 0</span>
+    <span class="progress-label" id="sort-score-label">Score: 0</span>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="sort-pbar" style="width:0%"></div></div>
+
+  <div class="game-card">
+    <div class="game-label">Concept Sort — Drag to the Right Bucket</div>
+    <div class="game-prompt" id="sort-instructions"></div>
+    <div class="sort-bank" id="sort-bank"></div>
+    <div class="sort-zones" id="sort-zones"></div>
+    <div class="feedback-box" id="sort-feedback"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="showScreen('mode-screen')">← Menu</button>
+    <button class="btn btn-primary" id="sort-check-btn" onclick="checkSort()">Check Answers</button>
+    <button class="btn btn-accent" id="sort-next-btn" onclick="sortNext()" style="display:none">Next Round →</button>
+  </div>
+</div>
+
+<!-- FILL BLANK SCREEN -->
+<div id="fill-screen" class="screen">
+  <div class="progress-row">
+    <span class="progress-label" id="fill-prog-label">1 of 0</span>
+    <span class="progress-label"></span>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="fill-pbar" style="width:0%"></div></div>
+
+  <div class="game-card">
+    <div class="game-label">Fill the Gap</div>
+    <div class="game-prompt" id="fill-prompt"></div>
+    <div class="fill-sentence" id="fill-sentence"></div>
+    <div class="feedback-box" id="fill-feedback"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="showScreen('mode-screen')">← Menu</button>
+    <button class="btn btn-primary" id="fill-check-btn" onclick="checkFill()">Check</button>
+    <button class="btn btn-accent" id="fill-next-btn" onclick="fillNext()" style="display:none">Next →</button>
+  </div>
+</div>
+
+<!-- RECALL SCREEN -->
+<div id="recall-screen" class="screen">
+  <div class="progress-row">
+    <span class="progress-label" id="recall-prog-label">Essay 1 of 3</span>
+    <span class="progress-label"></span>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="recall-pbar" style="width:0%"></div></div>
+
+  <div class="game-card">
+    <div class="game-label">Free Recall — Write What You Know</div>
+    <div class="game-prompt" id="recall-prompt"></div>
+    <textarea class="recall-box" id="recall-textarea" placeholder="Write your answer here. Don't look at the cheat sheet. Just go."></textarea>
+    <div class="key-points-reveal" id="recall-reveal">
+      <div class="kp-header">✓ Key Points — Check What You Covered</div>
+      <div id="kp-list"></div>
+    </div>
+    <div class="feedback-box info show" style="margin-top:0.75rem;display:none" id="recall-score-box"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="showScreen('mode-screen')">← Menu</button>
+    <button class="btn btn-primary" id="recall-reveal-btn" onclick="revealKeyPoints()">Reveal Key Points</button>
+    <button class="btn btn-accent" id="recall-next-btn" onclick="recallNext()" style="display:none">Next Essay →</button>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="results-screen" class="screen">
+  <div class="result-banner">
+    <div style="font-family:'Inconsolata',monospace;font-size:.65rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase">Round Complete</div>
+    <div class="result-score" id="res-score">0</div>
+    <div style="font-family:'Inconsolata',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.15em" id="res-sub"></div>
+    <div class="result-msg" id="res-msg"></div>
+  </div>
+
+  <div class="btn-row" style="justify-content:center">
+    <button class="btn btn-primary" onclick="showScreen('mode-screen')">← Menu</button>
+    <button class="btn btn-accent" id="res-replay-btn" onclick="replayMode()">Play Again</button>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const WHICH_ITEMS = [
+  // Essay 1
+  { statement: "The first victimization event creates new vulnerabilities — broken locks, traumatized victim, offender who now knows your routine.", answer: "Boost Theory", essay: 1 },
+  { statement: "Stable pre-existing conditions like poverty, neighborhood disadvantage, and risky lifestyle choices flag a person as a consistent target.", answer: "Flag Theory", essay: 1 },
+  { statement: "Risk peaks immediately after the first victimization and then decays over time as circumstances recover.", answer: "Boost Theory", essay: 1 },
+  { statement: "Both Boost and Flag can operate at the same time — they are not mutually exclusive.", answer: "Both (E1)", essay: 1 },
+  { statement: "Someone who lives in a high-crime neighborhood is at elevated risk regardless of whether they've ever been victimized before.", answer: "Flag Theory", essay: 1 },
+  { statement: "State dependence theory — the idea that prior victimization itself is the causal mechanism.", answer: "Boost Theory", essay: 1 },
+  { statement: "Risk heterogeneity — the underlying characteristics that produced the first victimization are still present.", answer: "Flag Theory", essay: 1 },
+  { statement: "Neither Boost nor Flag is universally superior — empirical evidence supports both and context determines which dominates.", answer: "Both (E1)", essay: 1 },
+  // Essay 2
+  { statement: "A cognitive, rational estimate of the probability of being victimized.", answer: "Perceived Risk", essay: 2 },
+  { statement: "An emotional, affective response — the feeling of being unsafe in one's body.", answer: "Fear of Victimization", essay: 2 },
+  { statement: "A police officer rationally assesses high risk every day at work but does not experience panic — their emotion is professionally regulated.", answer: "High Risk, Low Fear", essay: 2 },
+  { statement: "An elderly woman in a safe suburb feels deeply unsafe because she perceives herself as physically unable to defend herself.", answer: "High Fear, Low Risk", essay: 2 },
+  { statement: "The affective component of the fear of crime — 'I feel unsafe.'", answer: "Fear of Victimization", essay: 2 },
+  { statement: "The cognitive component of the fear of crime — 'I think there is a X% chance something will happen to me.'", answer: "Perceived Risk", essay: 2 },
+  // Essay 3
+  { statement: "Explains why certain people place themselves in high-opportunity situations in the first place — beyond just where and when.", answer: "Value Added (E3)", essay: 3 },
+  { statement: "Low self-control explains crime and is partly defined by criminal behavior — making the theory circular.", answer: "Tautology Weakness", essay: 3 },
+  { statement: "Self-control theory applies to both offenders AND victims — impulsivity creates risk on both sides of the crime event.", answer: "Strength (E3)", essay: 3 },
+  { statement: "Explains the convergence in time and space, but not why specific individuals consistently create that convergence.", answer: "Opportunity / RAT Limitation", essay: 3 },
+  { statement: "Someone is out at 2am in a high-crime area without a guardian — this behavior pattern is explained by individual-level theory, not just opportunity.", answer: "Value Added (E3)", essay: 3 },
+  { statement: "The theory's explanatory power is its weakness — it is so broad that it is difficult to falsify.", answer: "Tautology Weakness", essay: 3 },
+];
+
+const SORT_ROUNDS = [
+  {
+    label: "Sort into: Boost Theory vs. Flag Theory",
+    zones: ["Boost Theory (State Dependence)", "Flag Theory (Risk Heterogeneity)"],
+    items: [
+      { text: "Offender learns your routine after first break-in", zone: 0 },
+      { text: "Poverty keeps you in a high-crime neighborhood", zone: 1 },
+      { text: "Risk peaks right after victimization, then decays", zone: 0 },
+      { text: "Low self-control is a stable trait that persists", zone: 1 },
+      { text: "Broken lock isn't fixed, making re-entry easy", zone: 0 },
+      { text: "Risky nighttime lifestyle predates any victimization", zone: 1 },
+    ]
+  },
+  {
+    label: "Sort into: Perceived Risk vs. Fear of Victimization",
+    zones: ["Perceived Risk (Cognitive)", "Fear of Victimization (Affective)"],
+    items: [
+      { text: "'I estimate a 30% chance something could happen here'", zone: 0 },
+      { text: "Heart races when walking to the car at night", zone: 1 },
+      { text: "Calculating the statistical likelihood of burglary in your zip code", zone: 0 },
+      { text: "Feeling unsafe even in a statistically safe neighborhood", zone: 1 },
+      { text: "Rational probability judgment based on available information", zone: 0 },
+      { text: "Emotional, bodily sense of danger regardless of actual odds", zone: 1 },
+    ]
+  },
+  {
+    label: "Sort into: Strength of Theory vs. Limitation of Theory (Essay 3)",
+    zones: ["Strength / Value Added", "Weakness / Limitation"],
+    items: [
+      { text: "Explains WHY people put themselves in risky situations", zone: 0 },
+      { text: "Low self-control is defined by the thing it's meant to explain", zone: 1 },
+      { text: "Applies to victim and offender — not just one side", zone: 0 },
+      { text: "So broad it explains nearly everything, making it unfalsifiable", zone: 1 },
+      { text: "Fills the gap that opportunity theory leaves at the individual level", zone: 0 },
+      { text: "Hard to measure self-control independently of criminal outcomes", zone: 1 },
+    ]
+  }
+];
+
+const FILL_ITEMS = [
+  {
+    context: "Essay 1 — Recurring Victimization",
+    sentence: "Boost Theory argues that _____ itself creates new vulnerability for future victimization.",
+    blank: "the victimization event",
+    hint: "What is the causal mechanism in state dependence theory?",
+    accept: ["the victimization event","the first victimization","prior victimization","the event itself","victimization"]
+  },
+  {
+    context: "Essay 1 — Recurring Victimization",
+    sentence: "Flag Theory argues that _____ characteristics — like poverty, neighborhood, and lifestyle — explain recurring risk.",
+    blank: "stable pre-existing",
+    hint: "What kind of characteristics does risk heterogeneity point to?",
+    accept: ["stable","pre-existing","stable pre-existing","underlying stable","persistent"]
+  },
+  {
+    context: "Essay 1 — Recurring Victimization",
+    sentence: "Boost and Flag theories are NOT mutually exclusive — both can _____ at the same time.",
+    blank: "operate simultaneously",
+    hint: "What can both theories do at once?",
+    accept: ["operate","operate simultaneously","work together","operate at the same time","both apply"]
+  },
+  {
+    context: "Essay 2 — Perceived Risk vs. Fear",
+    sentence: "Perceived risk is a _____ estimate of the probability of being victimized, not an emotional response.",
+    blank: "cognitive / rational",
+    hint: "What kind of mental process is perceived risk?",
+    accept: ["cognitive","rational","cognitive rational","logical","analytical","cognitive/rational"]
+  },
+  {
+    context: "Essay 2 — Perceived Risk vs. Fear",
+    sentence: "Fear of victimization is best described as an _____ response — the feeling of being unsafe.",
+    blank: "affective / emotional",
+    hint: "What component of experience is fear — cognitive or affective?",
+    accept: ["affective","emotional","affective emotional","emotional affective","feeling","affective/emotional"]
+  },
+  {
+    context: "Essay 2 — Perceived Risk vs. Fear",
+    sentence: "The paradox of high fear but low risk is illustrated by elderly women — their fear is driven by _____, not actual victimization odds.",
+    blank: "vulnerability perception",
+    hint: "What is the psychological driver of fear in elderly women despite low actual risk?",
+    accept: ["vulnerability","vulnerability perception","perceived vulnerability","physical vulnerability","their vulnerability"]
+  },
+  {
+    context: "Essay 3 — Theory + Opportunity",
+    sentence: "The key weakness of self-control theory is that it is _____ — low self-control is defined by the very behavior it claims to explain.",
+    blank: "tautological",
+    hint: "The circular reasoning criticism of self-control theory is called?",
+    accept: ["tautological","circular","tautology","circular reasoning","self-referential"]
+  },
+  {
+    context: "Essay 3 — Theory + Opportunity",
+    sentence: "Opportunity theory (RAT) tells you WHERE and WHEN victimization happens; self-control theory tells you _____ certain individuals consistently create those situations.",
+    blank: "why",
+    hint: "What explanatory dimension does individual theory add beyond opportunity?",
+    accept: ["why","the reason why","the reason","why specific people","why some people"]
+  },
+  {
+    context: "Essay 3 — Theory + Opportunity",
+    sentence: "Self-control theory's strength is that it explains the impulsivity of both _____ and _____.",
+    blank: "victims and offenders",
+    hint: "Both sides of the crime event are explained — who are they?",
+    accept: ["victims and offenders","offenders and victims","both victims and offenders","the victim and the offender"]
+  },
+];
+
+const RECALL_PROMPTS = [
+  {
+    essay: 1,
+    prompt: "Explain recurring victimization using (a) State Dependence / Boost Theory and (b) Risk Heterogeneity / Flag Theory. Then address: (c) Can both operate simultaneously? (d) Does one offer a better explanation?",
+    keyPoints: [
+      "Boost/State Dependence: the victimization event itself creates new vulnerability",
+      "Examples of boost mechanisms: offender learns routine, broken locks, trauma",
+      "Flag/Risk Heterogeneity: stable pre-existing conditions (poverty, neighborhood, lifestyle) elevate risk",
+      "Examples of flag characteristics: low income, high-crime area, risky lifestyle",
+      "Both CAN operate simultaneously — not mutually exclusive",
+      "Example of simultaneity: flagged by poverty AND boosted after a break-in",
+      "Neither is universally superior — empirical evidence supports both",
+      "Context determines which explanation dominates"
+    ]
+  },
+  {
+    essay: 2,
+    prompt: "Explain the difference between perceived risk of victimization and fear of victimization. How are they related? Why might someone have high perceived risk but low fear, or high fear but low perceived risk? Use examples.",
+    keyPoints: [
+      "Perceived risk = cognitive/rational estimate of likelihood of victimization",
+      "Fear = emotional/affective response — the feeling of being unsafe",
+      "They are related but not the same dimension (cognitive vs. affective)",
+      "High risk, low fear example: police/ER workers assess risk professionally but regulate emotion",
+      "Explanation: training and experience suppress the emotional component",
+      "High fear, low risk example: elderly woman in safe suburb feels unsafe",
+      "Explanation: vulnerability perception (physical inability to defend self) drives fear",
+      "Actual victimization risk does not perfectly predict fear — paradox of fear"
+    ]
+  },
+  {
+    essay: 3,
+    prompt: "Describe the usefulness of criminological theories (e.g., self-control theory) for explaining victimization. Discuss strengths and weaknesses. Explain what 'value added' these theories provide beyond the opportunity approach. Use examples.",
+    keyPoints: [
+      "Strength: self-control theory explains impulsivity of BOTH victims and offenders",
+      "Strength: fills gap left by opportunity theory at the individual level",
+      "Weakness: tautological — low self-control defined by the behavior it explains",
+      "Weakness: hard to falsify — explains almost everything",
+      "Opportunity theory (RAT) tells you WHERE/WHEN victimization occurs",
+      "Value added: theory explains WHY certain people consistently put themselves in high-opportunity situations",
+      "Example: RAT explains convergence of motivated offender, target, no guardian",
+      "Example: self-control explains why someone is out at 2am in high-crime area — the routine itself is the product of low self-control"
+    ]
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  pts: 0,
+  streak: 0,
+  correct: 0,
+  total: 0,
+  essayHits: { 1: 0, 2: 0, 3: 0 },
+  essayTotal: { 1: 0, 2: 0, 3: 0 }
+};
+
+let currentMode = '';
+let wtIndex = 0;
+let wtDeck = [];
+let wtStreakArr = [];
+let sortRoundIndex = 0;
+let fillIndex = 0;
+let fillDeck = [];
+let recallIndex = 0;
+let lastMode = '';
+
+function updateScoreStrip() {
+  document.getElementById('g-pts').textContent = state.pts;
+  document.getElementById('g-streak').textContent = state.streak;
+  document.getElementById('g-correct').textContent = state.correct;
+  const pct = state.total > 0 ? Math.round((state.correct / state.total) * 100) : 0;
+  document.getElementById('g-mastery').textContent = pct + '%';
+  // Update essay mastery bars
+  for (let e = 1; e <= 3; e++) {
+    const t = state.essayTotal[e];
+    const h = state.essayHits[e];
+    const p = t > 0 ? Math.round((h / t) * 100) : 0;
+    const el = document.getElementById('mastery-e' + e);
+    if (el) el.style.width = p + '%';
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'mode-screen') updateScoreStrip();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function toggleRef() {
+  const body = document.getElementById('ref-body');
+  const label = document.getElementById('ref-toggle-label');
+  body.classList.toggle('open');
+  label.textContent = body.classList.contains('open') ? 'HIDE ▴' : 'SHOW ▾';
+}
+
+// ============================================================
+// MODE ROUTER
+// ============================================================
+function startMode(mode) {
+  lastMode = mode;
+  currentMode = mode;
+  if (mode === 'which') startWhichTheory();
+  else if (mode === 'sort') startSort();
+  else if (mode === 'fill') startFill();
+  else if (mode === 'recall') startRecall();
+}
+
+function replayMode() { startMode(lastMode); }
+
+// ============================================================
+// WHICH THEORY MODE
+// ============================================================
+function startWhichTheory() {
+  wtDeck = shuffle(WHICH_ITEMS);
+  wtIndex = 0;
+  wtStreakArr = [];
+  showScreen('which-screen');
+  renderWhich();
+}
+
+function renderWhich() {
+  const total = wtDeck.length;
+  const item = wtDeck[wtIndex];
+  const pct = Math.round((wtIndex / total) * 100);
+
+  document.getElementById('wt-prog-label').textContent = `${wtIndex + 1} of ${total}`;
+  document.getElementById('wt-streak-label').textContent = `Streak: ${state.streak}`;
+  document.getElementById('wt-pbar').style.width = pct + '%';
+  document.getElementById('wt-prompt').textContent = `"${item.statement}"`;
+  document.getElementById('wt-feedback').className = 'feedback-box';
+  document.getElementById('wt-feedback').innerHTML = '';
+  document.getElementById('wt-next').style.display = 'none';
+
+  // Build choices — pull unique answers from nearby items + correct
+  const allAnswers = [...new Set(WHICH_ITEMS.map(x => x.answer))];
+  const correct = item.answer;
+  const distractors = shuffle(allAnswers.filter(a => a !== correct)).slice(0, 3);
+  const choices = shuffle([correct, ...distractors]);
+
+  const container = document.getElementById('wt-choices');
+  container.innerHTML = choices.map(c => `
+    <button class="theory-chip" onclick="selectWhich(this, '${c.replace(/'/g,"\\'")}', '${correct.replace(/'/g,"\\'")}', ${item.essay})">${c}</button>
+  `).join('');
+
+  // Streak dots
+  const dotsEl = document.getElementById('wt-streak-dots');
+  dotsEl.innerHTML = wtStreakArr.slice(-10).map(h => `<div class="streak-dot ${h ? 'hit' : 'miss'}"></div>`).join('');
+}
+
+function selectWhich(btn, chosen, correct, essay) {
+  document.querySelectorAll('.theory-chip').forEach(b => { b.disabled = true; b.onclick = null; });
+  const isCorrect = chosen === correct;
+  btn.classList.add(isCorrect ? 'selected-correct' : 'selected-wrong');
+  if (!isCorrect) {
+    document.querySelectorAll('.theory-chip').forEach(b => {
+      if (b.textContent === correct) b.classList.add('reveal-correct');
+    });
+  }
+
+  state.total++;
+  state.essayTotal[essay]++;
+  wtStreakArr.push(isCorrect);
+
+  const fb = document.getElementById('wt-feedback');
+  if (isCorrect) {
+    state.pts += 10 + (state.streak * 2);
+    state.streak++;
+    state.correct++;
+    state.essayHits[essay]++;
+    fb.className = 'feedback-box correct show';
+    fb.innerHTML = `<strong>✓ Correct!</strong> +${10 + (state.streak - 1) * 2} pts${state.streak > 2 ? ` · 🔥 ${state.streak} streak` : ''}`;
+  } else {
+    state.streak = 0;
+    fb.className = 'feedback-box wrong show';
+    fb.innerHTML = `<strong>✗ Not quite.</strong> The answer was: <strong>${correct}</strong>`;
+  }
+
+  updateScoreStrip();
+  document.getElementById('wt-next').style.display = 'inline-block';
+}
+
+function wtNext() {
+  wtIndex++;
+  if (wtIndex >= wtDeck.length) {
+    showRoundResults('Which Theory?', wtDeck.length);
+  } else {
+    renderWhich();
+  }
+}
+
+// ============================================================
+// SORT MODE
+// ============================================================
+let sortAnswers = [];
+let sortCorrectMap = {};
+
+function startSort() {
+  sortRoundIndex = 0;
+  showScreen('sort-screen');
+  renderSort();
+}
+
+function renderSort() {
+  const round = SORT_ROUNDS[sortRoundIndex];
+  const total = SORT_ROUNDS.length;
+  const pct = Math.round((sortRoundIndex / total) * 100);
+
+  document.getElementById('sort-prog-label').textContent = `Round ${sortRoundIndex + 1} of ${total}`;
+  document.getElementById('sort-pbar').style.width = pct + '%';
+  document.getElementById('sort-instructions').textContent = round.label;
+  document.getElementById('sort-feedback').className = 'feedback-box';
+  document.getElementById('sort-check-btn').style.display = 'inline-block';
+  document.getElementById('sort-next-btn').style.display = 'none';
+
+  const shuffled = shuffle(round.items);
+  sortCorrectMap = {};
+  shuffled.forEach((item, i) => { sortCorrectMap[`chip-${i}`] = item.zone; });
+
+  // Bank
+  document.getElementById('sort-bank').innerHTML = shuffled.map((item, i) => `
+    <div class="sort-chip" id="chip-${i}" draggable="true" 
+      ondragstart="dragStart(event)" 
+      ontouchstart="touchStart(event)">${item.text}</div>
+  `).join('');
+
+  // Zones
+  document.getElementById('sort-zones').innerHTML = round.zones.map((z, zi) => `
+    <div class="sort-zone" id="zone-${zi}" 
+      ondragover="dragOver(event)" 
+      ondragleave="dragLeave(event)"
+      ondrop="dropItem(event, ${zi})">
+      <div class="sort-zone-label" style="color:${zi===0?'var(--accent)':'var(--accent2)'}">${z}</div>
+    </div>
+  `).join('');
+
+  initTouchDrag();
+}
+
+let draggedEl = null;
+
+function dragStart(e) {
+  draggedEl = e.target;
+  e.target.classList.add('dragging');
+  e.dataTransfer.setData('text/plain', e.target.id);
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+
+function dragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function dropItem(e, zoneIndex) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const id = e.dataTransfer.getData('text/plain');
+  const chip = document.getElementById(id);
+  if (chip) {
+    chip.classList.remove('dragging');
+    e.currentTarget.appendChild(chip);
+  }
+}
+
+// Touch drag fallback
+let touchChip = null;
+let touchClone = null;
+
+function initTouchDrag() {
+  document.querySelectorAll('.sort-chip').forEach(chip => {
+    chip.addEventListener('touchstart', touchStart, { passive: false });
+    chip.addEventListener('touchmove', touchMove, { passive: false });
+    chip.addEventListener('touchend', touchEnd);
+  });
+}
+
+function touchStart(e) {
+  touchChip = e.currentTarget;
+  const rect = touchChip.getBoundingClientRect();
+  touchClone = touchChip.cloneNode(true);
+  touchClone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:0.8;pointer-events:none;z-index:9999;background:var(--card);border:1px solid var(--accent);border-radius:3px;padding:0.35rem 0.7rem;font-size:0.82rem;`;
+  document.body.appendChild(touchClone);
+}
+
+function touchMove(e) {
+  e.preventDefault();
+  if (!touchClone) return;
+  const t = e.touches[0];
+  touchClone.style.left = (t.clientX - 40) + 'px';
+  touchClone.style.top = (t.clientY - 20) + 'px';
+}
+
+function touchEnd(e) {
+  if (!touchClone || !touchChip) return;
+  const t = e.changedTouches[0];
+  document.body.removeChild(touchClone);
+  touchClone = null;
+
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  const zone = el && el.closest('.sort-zone');
+  if (zone) {
+    zone.appendChild(touchChip);
+  }
+  touchChip = null;
+}
+
+function checkSort() {
+  const round = SORT_ROUNDS[sortRoundIndex];
+  let correct = 0;
+  const chips = document.querySelectorAll('.sort-chip');
+
+  chips.forEach(chip => {
+    const parentZone = chip.closest('.sort-zone');
+    const correctZoneIndex = sortCorrectMap[chip.id];
+    chip.draggable = false;
+    chip.style.cursor = 'default';
+    if (parentZone) {
+      const zoneId = parseInt(parentZone.id.split('-')[1]);
+      if (zoneId === correctZoneIndex) {
+        chip.classList.add('placed-correct');
+        correct++;
+        state.correct++;
+        state.pts += 10;
+      } else {
+        chip.classList.add('placed-wrong');
+      }
+    } else {
+      chip.classList.add('placed-wrong');
+    }
+    state.total++;
+  });
+
+  // Track essay
+  const essayMap = { 0: 1, 1: 2, 2: 3 };
+  const e = essayMap[sortRoundIndex] || 1;
+  state.essayHits[e] = (state.essayHits[e] || 0) + correct;
+  state.essayTotal[e] = (state.essayTotal[e] || 0) + chips.length;
+
+  const fb = document.getElementById('sort-feedback');
+  fb.className = correct === chips.length ? 'feedback-box correct show' : 'feedback-box info show';
+  fb.innerHTML = `<strong>${correct} / ${chips.length} correct.</strong> ${correct === chips.length ? '🔥 Perfect round!' : 'Check the highlighted chips above.'}`;
+
+  document.getElementById('sort-check-btn').style.display = 'none';
+  document.getElementById('sort-next-btn').style.display = 'inline-block';
+  updateScoreStrip();
+}
+
+function sortNext() {
+  sortRoundIndex++;
+  if (sortRoundIndex >= SORT_ROUNDS.length) {
+    showRoundResults('Concept Sort', SORT_ROUNDS.reduce((s, r) => s + r.items.length, 0));
+  } else {
+    renderSort();
+  }
+}
+
+// ============================================================
+// FILL THE GAP MODE
+// ============================================================
+function startFill() {
+  fillDeck = shuffle(FILL_ITEMS);
+  fillIndex = 0;
+  showScreen('fill-screen');
+  renderFill();
+}
+
+function renderFill() {
+  const total = fillDeck.length;
+  const item = fillDeck[fillIndex];
+  const pct = Math.round((fillIndex / total) * 100);
+
+  document.getElementById('fill-prog-label').textContent = `${fillIndex + 1} of ${total}`;
+  document.getElementById('fill-pbar').style.width = pct + '%';
+  document.getElementById('fill-prompt').textContent = item.context;
+  document.getElementById('fill-feedback').className = 'feedback-box';
+  document.getElementById('fill-check-btn').style.display = 'inline-block';
+  document.getElementById('fill-next-btn').style.display = 'none';
+
+  const parts = item.sentence.split('_____');
+  document.getElementById('fill-sentence').innerHTML = parts.map((p, i) =>
+    i < parts.length - 1
+      ? `${p}<input class="blank-input" id="blank-${i}" placeholder="${item.hint}" autocomplete="off">`
+      : p
+  ).join('');
+
+  setTimeout(() => { const b = document.getElementById('blank-0'); if(b) b.focus(); }, 100);
+
+  document.querySelectorAll('.blank-input').forEach(inp => {
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') checkFill(); });
+  });
+}
+
+function checkFill() {
+  const item = fillDeck[fillIndex];
+  const inputs = document.querySelectorAll('.blank-input');
+  let allCorrect = true;
+
+  inputs.forEach(inp => {
+    const val = inp.value.trim().toLowerCase();
+    const isCorrect = item.accept.some(a => val.includes(a.toLowerCase()) || a.toLowerCase().includes(val));
+    inp.disabled = true;
+    inp.classList.add(isCorrect ? 'correct-input' : 'wrong-input');
+    if (!isCorrect) allCorrect = false;
+  });
+
+  state.total++;
+  const essay = item.context.match(/Essay (\d)/)?.[1];
+  if (essay) { state.essayTotal[+essay]++; }
+
+  const fb = document.getElementById('fill-feedback');
+  if (allCorrect) {
+    state.pts += 15;
+    state.streak++;
+    state.correct++;
+    if (essay) state.essayHits[+essay]++;
+    fb.className = 'feedback-box correct show';
+    fb.innerHTML = `<strong>✓ Correct!</strong> The key term: <em>${item.blank}</em>`;
+  } else {
+    state.streak = 0;
+    fb.className = 'feedback-box wrong show';
+    fb.innerHTML = `<strong>✗ Not quite.</strong> The answer was: <strong>${item.blank}</strong>`;
+  }
+
+  updateScoreStrip();
+  document.getElementById('fill-check-btn').style.display = 'none';
+  document.getElementById('fill-next-btn').style.display = 'inline-block';
+}
+
+function fillNext() {
+  fillIndex++;
+  if (fillIndex >= fillDeck.length) {
+    showRoundResults('Fill the Gap', fillDeck.length);
+  } else {
+    renderFill();
+  }
+}
+
+// ============================================================
+// FREE RECALL MODE
+// ============================================================
+function startRecall() {
+  recallIndex = 0;
+  showScreen('recall-screen');
+  renderRecall();
+}
+
+function renderRecall() {
+  const total = RECALL_PROMPTS.length;
+  const item = RECALL_PROMPTS[recallIndex];
+  const pct = Math.round((recallIndex / total) * 100);
+
+  document.getElementById('recall-prog-label').textContent = `Essay ${recallIndex + 1} of ${total}`;
+  document.getElementById('recall-pbar').style.width = pct + '%';
+  document.getElementById('recall-prompt').textContent = item.prompt;
+  document.getElementById('recall-textarea').value = '';
+  document.getElementById('recall-textarea').disabled = false;
+  document.getElementById('recall-reveal').classList.remove('show');
+  document.getElementById('recall-reveal-btn').style.display = 'inline-block';
+  document.getElementById('recall-next-btn').style.display = 'none';
+  document.getElementById('recall-score-box').style.display = 'none';
+}
+
+function revealKeyPoints() {
+  const item = RECALL_PROMPTS[recallIndex];
+  document.getElementById('recall-textarea').disabled = true;
+  document.getElementById('recall-reveal-btn').style.display = 'none';
+  document.getElementById('recall-next-btn').style.display = 'inline-block';
+
+  const list = document.getElementById('kp-list');
+  list.innerHTML = item.keyPoints.map((kp, i) => `
+    <div class="kp-item">
+      <div class="kp-check" id="kp-${i}" onclick="toggleKP(${i}, ${item.essay})">☐</div>
+      <div>${kp}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('recall-reveal').classList.add('show');
+  document.getElementById('recall-score-box').style.display = 'block';
+  document.getElementById('recall-score-box').innerHTML = '<strong>Check each point you covered.</strong> Be honest with yourself — that\'s how this works.';
+}
+
+let kpChecked = {};
+function toggleKP(i, essay) {
+  const el = document.getElementById('kp-' + i);
+  const wasChecked = kpChecked[i];
+  kpChecked[i] = !wasChecked;
+  el.classList.toggle('checked');
+  el.textContent = kpChecked[i] ? '✓' : '☐';
+
+  if (kpChecked[i]) {
+    state.pts += 5;
+    state.correct++;
+    state.essayHits[essay] = (state.essayHits[essay] || 0) + 1;
+  } else {
+    state.pts = Math.max(0, state.pts - 5);
+    state.correct = Math.max(0, state.correct - 1);
+    state.essayHits[essay] = Math.max(0, (state.essayHits[essay] || 0) - 1);
+  }
+
+  const checked = Object.values(kpChecked).filter(Boolean).length;
+  const item = RECALL_PROMPTS[recallIndex];
+  const pct = Math.round((checked / item.keyPoints.length) * 100);
+  const box = document.getElementById('recall-score-box');
+  box.innerHTML = `<strong>Self-score: ${checked}/${item.keyPoints.length} points covered (${pct}%)</strong>${pct >= 75 ? ' — You\'re ready to write this one.' : ' — Review what you missed before the exam.'}`;
+
+  updateScoreStrip();
+}
+
+function recallNext() {
+  kpChecked = {};
+  recallIndex++;
+  if (recallIndex >= RECALL_PROMPTS.length) {
+    showRoundResults('Free Recall', RECALL_PROMPTS.length * 8);
+  } else {
+    renderRecall();
+  }
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function showRoundResults(mode, total) {
+  showScreen('results-screen');
+  const pct = total > 0 ? Math.round((state.correct / state.total) * 100) : 0;
+  document.getElementById('res-score').textContent = state.pts + ' pts';
+  document.getElementById('res-sub').textContent = `${state.correct} correct · ${state.streak} current streak · ${pct}% accuracy`;
+
+  let msg = '';
+  if (pct >= 85) msg = "You know this material cold. The essays are locked in.";
+  else if (pct >= 70) msg = "Solid. Run the Concept Sort again to sharpen the categories.";
+  else if (pct >= 55) msg = "Getting there. Hit Free Recall mode — writing it out is what locks it in for essays.";
+  else msg = "Use the cheat sheet, then run Fill the Gap again. The vocabulary will come.";
+
+  document.getElementById('res-msg').textContent = msg;
+  updateScoreStrip();
+}
+</script>
+</body>
+</html>
